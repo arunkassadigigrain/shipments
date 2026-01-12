@@ -1,0 +1,70 @@
+
+
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
+import ThemeProvider from "@/app/components/ThemeProvider";
+import { Providers } from "@/app/providers";
+import { ToastContainer } from "react-toastify";
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+  display: "swap", // Ensures no flash of unstyled text
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+export const metadata: Metadata = {
+  title: {
+    default: "My Next.js App",
+    template: "%s | My Next.js App",
+  },
+  description: "A modern Next.js application built with the latest best practices.",
+  keywords: ["Next.js", "React", "TypeScript", "Tailwind CSS"],
+  authors: [{ name: "Your Name" }],
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://your-site.com",
+    siteName: "My Next.js App",
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@yourhandle",
+  },
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
+      >
+        <Providers>
+        <ThemeProvider>
+          {children}
+          <ToastContainer
+            position="bottom-right"
+            autoClose={6000}
+            hideProgressBar={false}
+            closeOnClick
+            pauseOnHover
+            draggable
+            pauseOnFocusLoss
+            toastClassName="custom-toast"
+          />
+        </ThemeProvider>
+        </Providers>
+      </body>
+    </html>
+  );
+}
+

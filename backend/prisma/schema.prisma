@@ -1,0 +1,120 @@
+datasource db {
+  provider = "postgresql"
+}
+generator client {
+  provider = "prisma-client-js"
+}
+model Item {
+  id              Int @id @default(autoincrement())
+  itemName        String
+  itemVariety     String
+  packingType     String
+  itemDescription String
+  shipmentItems   ShipmentItem[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model BillingAddress {
+  id              Int @id @default(autoincrement())
+  addressLine1    String
+  addressLine2    String?
+  cityOrDistrict  String
+  stateOrProvince String
+  postalCode      Int
+  businesses      Business[]
+}
+
+model ShippingAddress {
+  id              Int @id @default(autoincrement())
+  addressLine1    String
+  addressLine2    String?
+  cityOrDistrict  String
+  stateOrProvince String
+  postalCode      Int
+  shipments       Shipment[]
+}
+
+model Business {
+  id                Int @id @default(autoincrement())
+  businessName      String
+  contactPersonName String
+  phoneNumber       String
+  email             String
+  billingAddressId Int
+  billingAddress   BillingAddress @relation(fields: [billingAddressId], references: [id])
+  shipments        Shipment[]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Driver {
+  id                   Int @id @default(autoincrement())
+  Drivername                String
+  phoneNumber          String
+  alternatePhoneNumber String?
+  trips                Trip[]
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
+
+model Truck {
+  id                   Int @id @default(autoincrement())
+  truckNumber          String 
+  truckCapacity        Int
+  truckModel           String
+  ownerPhoneNumber     String
+  alternatePhoneNumber String?
+  trips                Trip[]
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
+
+model Shipment {
+  id                Int @id @default(autoincrement())
+  shipmentDate      DateTime @default(now())
+  businessId        Int
+  business          Business @relation(fields: [businessId], references: [id])
+  shippingAddressId Int
+  shippingAddress   ShippingAddress @relation(fields: [shippingAddressId], references: [id])
+  totalAmount       Decimal @db.Decimal(12, 2)
+  shipmentItems     ShipmentItem[]
+  trips             Trip[]
+  Status            Status @default(CREATED)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model ShipmentItem {
+  id          Int @id @default(autoincrement())
+  shipmentId Int
+  shipment   Shipment @relation(fields: [shipmentId], references: [id])
+  itemId     Int
+  item       Item @relation(fields: [itemId], references: [id])
+  quantity   Int
+  itemRate   Decimal @db.Decimal(10, 2)
+  subtotal   Decimal @db.Decimal(12, 2)
+  createdAt  DateTime @default(now())
+}
+
+model Trip {
+  id           Int @id @default(autoincrement())
+  tripDate     DateTime @default(now())
+  OTPGenerated Int
+
+  Status       Status @default(ONTHEWAY)
+  driverId     Int
+  driver       Driver @relation(fields: [driverId], references: [id])
+  shipmentId  Int
+  shipment    Shipment @relation(fields: [shipmentId], references: [id])
+  truckId     Int
+  truck       Truck @relation(fields: [truckId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum Status {
+  CREATED
+  ONTHEWAY
+  COMPLETED
+}
