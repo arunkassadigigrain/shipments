@@ -1,60 +1,59 @@
 "use client";
- 
+
 import Sidebar from "@/app/components/sidebar";
-import { useEffect, useState, useMemo } from "react";
- 
-type Item = {
+import { useState, useMemo } from "react";
+import { useGetAllItemsQuery } from "@/app/services/itemApi";
+import { Menu } from "lucide-react";
+
+type item = {
+  id: string;
   itemName: string;
   itemVariety: string;
   packingType: string;
-  itemDetails: string;
+ itemDescription?: string;
 };
- 
+
 export default function ShipmentStatusPage() {
-  const [items, setItems] = useState<Item[]>([]);
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
- 
-  // 🔹 Fetch data from backend (PostgreSQL via API)
-  useEffect(() => {
-    const fetchItems = async () => {
-      try {
-        const res = await fetch("/api/items");
-        if (!res.ok) throw new Error("Failed to fetch items");
-        const data: Item[] = await res.json();
-        setItems(data);
-      } catch (error) {
-        console.error("Error fetching items:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
- 
-    fetchItems();
-  }, []);
- 
-  // 🔹 Filter items using useMemo (VDOM optimized)
+
+  // 🔹 RTK Query hook
+  const {
+    data: items = [],
+    isLoading,
+    isError,
+  } = useGetAllItemsQuery();
+
+  // 🔹 Filter items
   const filteredItems = useMemo(() => {
     const query = search.toLowerCase();
- 
+
     return items.filter(
       (item) =>
         item.itemName.toLowerCase().includes(query) ||
         item.itemVariety.toLowerCase().includes(query) ||
         item.packingType.toLowerCase().includes(query) ||
-        item.itemDetails.toLowerCase().includes(query)
+        item.itemDescription?.toLowerCase().includes(query)
     );
   }, [items, search]);
- 
+
   return (
     <div className="drawer lg:drawer-open min-h-screen">
       <Sidebar />
- 
       <div className="drawer-content bg-base-200 p-6">
-        {/* Header + Search (Right aligned) */}
+        {/* Header */}
+       
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+{/* Drawer toggle button (mobile only) */}
+                  <label
+      htmlFor="my-drawer"
+      className="btn btn-square btn-ghost lg:hidden"
+    >
+      <Menu className="h-5 w-5" />
+                  </label>
+
+
           <h1 className="text-2xl font-bold">Items</h1>
- 
+
           <input
             type="text"
             placeholder="Search items..."
@@ -63,25 +62,31 @@ export default function ShipmentStatusPage() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
- 
+
         {/* Table */}
         <div className="card bg-base-100 shadow rounded-xl">
           <div className="overflow-x-auto p-4">
             <table className="table table-zebra w-full">
-              <thead>
+               <thead className="text-black">
                 <tr>
                   <th>Item Name</th>
                   <th>Item Variety</th>
                   <th>Packing Type</th>
-                  <th>Item Details</th>
+                  <th>ItemDescription</th>
                 </tr>
               </thead>
- 
+
               <tbody>
-                {loading ? (
+                {isLoading ? (
                   <tr>
                     <td colSpan={4} className="text-center">
                       Loading...
+                    </td>
+                  </tr>
+                ) : isError ? (
+                  <tr>
+                    <td colSpan={4} className="text-center text-red-500">
+                      Failed to load items
                     </td>
                   </tr>
                 ) : filteredItems.length === 0 ? (
@@ -91,12 +96,12 @@ export default function ShipmentStatusPage() {
                     </td>
                   </tr>
                 ) : (
-                  filteredItems.map((item, index) => (
-                    <tr key={index}>
+                  filteredItems.map((item) => (
+                    <tr key={item.id}>
                       <td>{item.itemName}</td>
                       <td>{item.itemVariety}</td>
                       <td>{item.packingType}</td>
-                      <td>{item.itemDetails}</td>
+                      <td>{item.itemDescription?? "-"}</td>
                     </tr>
                   ))
                 )}
@@ -108,4 +113,3 @@ export default function ShipmentStatusPage() {
     </div>
   );
 }
- 

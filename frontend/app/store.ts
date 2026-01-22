@@ -4,6 +4,8 @@ import { itemApi } from './services/itemApi'
 import { customerApi } from './services/customerApi'
 import { truckApi } from './services/truckApi'
 import { driverApi } from './services/driverApi'
+import { tripsApi } from './services/tripApi'
+import { shipmentApi } from './services/shipmentApi'
 
 export const store = configureStore({
   reducer: {
@@ -11,9 +13,11 @@ export const store = configureStore({
     [customerApi.reducerPath]: customerApi.reducer,
     [truckApi.reducerPath]: truckApi.reducer,
     [driverApi.reducerPath]: driverApi.reducer,
+    [tripsApi.reducerPath]: tripsApi.reducer,
+    [shipmentApi.reducerPath]: shipmentApi.reducer,
   },
   middleware: (getDefaultMiddleware) => 
-    getDefaultMiddleware().concat(itemApi.middleware, customerApi.middleware, truckApi.middleware, driverApi.middleware),
+    getDefaultMiddleware().concat(itemApi.middleware, customerApi.middleware, truckApi.middleware, driverApi.middleware, tripsApi.middleware, shipmentApi.middleware),
 })
 
 setupListeners(store.dispatch);

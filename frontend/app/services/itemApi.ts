@@ -6,7 +6,7 @@ interface Item {
   itemName: string
   itemVariety: string
   packingType: string
-  description?: string
+  itemDescription?: string
   createdAt: string
   updatedAt: string
 }

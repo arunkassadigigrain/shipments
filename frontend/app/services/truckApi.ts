@@ -26,7 +26,7 @@ export const truckApi = createApi({
       invalidatesTags: ["Truck"],
     }),
     getAllTrucks: builder.query<Truck[], void>({  
-      query: () => "/getAllTrucks",
+      query: () => "/getAllTruck",
       providesTags: ['Truck'], 
     }),
     getTruck: builder.query<Truck, string>({  

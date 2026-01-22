@@ -6,7 +6,7 @@ class ItemController {
     static getAllItems = async (req, res) => {
         try {
             const items = await prisma.item.findMany();
-            sendWhatsAppTemplate.sendWhatsAppTemplate("919392382434", "praveen");
+            // sendWhatsAppTemplate.sendWhatsAppTemplate("919392382434", "praveen");
             res.status(200).json(items);
         } catch (error) {
             console.error(error);
@@ -40,7 +40,6 @@ class ItemController {
             if (!itemName || !packingType || !itemVariety) {
                 return res.status(400).json({ error: "All fields are required" });
             }
-            console.log("Creating item with:", itemName, packingType, itemVariety);
             let Description = itemName + " of " + packingType + " with " + itemVariety;
 
 

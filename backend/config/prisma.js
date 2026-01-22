@@ -1,9 +1,3 @@
-// import { PrismaClient } from "@prisma/client"
-// console.log('ItemController loaded');
-// const prisma = new PrismaClient()
-
-// export default prisma;
-
 
 import dotenv from "dotenv";
 dotenv.config();

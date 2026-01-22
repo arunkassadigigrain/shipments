@@ -4,7 +4,7 @@ import truckControlles from "../controllers/truckController.js";
 const router = express.Router();
  
  
-router.get("/gettruck", truckControlles.getAllTruck);
+router.get("/getAllTruck", truckControlles.getAllTruck);
 router.post("/createtruck", truckControlles.createTruck);
 router.get("/gettruckbyid/:id", truckControlles.getTruckById);
 router.patch("/updatetruck/:id", truckControlles.updatetruck);
