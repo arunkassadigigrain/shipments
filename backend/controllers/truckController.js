@@ -4,7 +4,11 @@ class TruckController {
 
     static async getAllTruck(req, res) {
         try {
-            const trucks = await prisma.truck.findMany();
+            const trucks = await prisma.truck.findMany({
+                include: {
+                    defaultDriver: true, // ✅ relation
+                },
+            });
             res.json(trucks);
         } catch (error) {
             console.log(error);
@@ -12,7 +16,7 @@ class TruckController {
         }
     }
 
-        static getTruckById = async (req, res) => {
+    static getTruckById = async (req, res) => {
         try {
             const { id } = req.params;
 
@@ -37,15 +41,18 @@ class TruckController {
                 truckNumber,
                 truckCapacity,
                 truckModel,
+                defaultDriverId,
                 ownerPhoneNumber,
                 alternatePhoneNumber
             } = req.body;
+            console.log(req.body);
 
             const newTruck = await prisma.truck.create({
                 data: {
                     truckNumber,
                     truckCapacity,
                     truckModel,
+                    defaultDriverId,
                     ownerPhoneNumber,
                     alternatePhoneNumber
                 }

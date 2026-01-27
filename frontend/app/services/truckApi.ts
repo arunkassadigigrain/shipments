@@ -2,12 +2,13 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 interface Truck {
-  id: string
+  id: number
   truckNumber: string
   truckCapacity: number
   truckModel: string
   ownerPhoneNumber: string
   alternatePhoneNumber?: string
+  defaultDriverId?: number
   createdAt: string
   updatedAt: string
 }

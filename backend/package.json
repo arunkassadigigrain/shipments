@@ -13,15 +13,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/adapter-pg": "^7.2.0",
-    "@prisma/client": "^7.2.0",
+    "@prisma/adapter-pg": "^7.3.0",
+    "@prisma/client": "^7.3.0",
     "axios": "^1.13.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "http": "^0.0.1-security",
+    "nodemailer": "^7.0.12",
     "pg": "^8.16.3",
-    "prisma": "^7.2.0"
+    "prisma": "^7.3.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"

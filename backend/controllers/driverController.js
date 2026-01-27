@@ -1,61 +1,94 @@
 
 import prisma from "../config/prisma.js";
 
-class DriverControlles {
+
+class DriverController {
+
+    // 🔹 Get all drivers (with truck info)
     static async getAllDrivers(req, res) {
         try {
-            const drivers = await prisma.driver.findMany();
-            res.json(drivers);
-        }
-        catch (error) {
-            res.status(500).json({ error: 'failed  to fetch driver' });
+            const drivers = await prisma.driver.findMany({
+                include: {
+                    truck: true,
+                },
+            });
+
+            res.status(200).json(drivers);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: "Failed to fetch drivers" });
         }
     }
+
     static async createDriver(req, res) {
         try {
-            const { Drivername, phoneNumber, alternatePhoneNumber } = req.body;
-            console.log(req.body);
+            const {
+                Drivername,
+                phoneNumber,
+                alternatePhoneNumber,
+                truckId,
+            } = req.body;
+
+            // ✅ Create driver
             const newDriver = await prisma.driver.create({
-                data: { Drivername, phoneNumber, alternatePhoneNumber }
+                data: {
+                    Drivername,
+                    phoneNumber,
+                    alternatePhoneNumber,
+                    truckId: truckId ? Number(truckId) : null,
+                },
             });
-            console.log(newDriver);
 
             res.status(201).json(newDriver);
-
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: "Failed to create driver" });
         }
-        catch (error) {
-            res.status(500).json(error.message, { error: 'Failed to create driver' });
-
-        }
-
     }
+
+    // 🔹 Update Driver
     static async updateDriver(req, res) {
         try {
             const { id } = req.params;
-            const { Drivername, phoneNumber, alternatePhoneNumber } = req.body;
-            const updateDriver = await prisma.driver.update({
-                where: { id: Number(id) },
-                data: { Drivername, phoneNumber, alternatePhoneNumber }
-            });
-            res.status(201).json(updateDriver);
+            const {
+                driverName,
+                phoneNumber,
+                alternatePhoneNumber,
+                truckId,
+            } = req.body;
 
-        }
-        catch (error) {
-            res.status(500).json({ error: 'Failed to create update' });
+            const updatedDriver = await prisma.driver.update({
+                where: { id: Number(id) },
+                data: {
+                    driverName,
+                    phoneNumber,
+                    alternatePhoneNumber,
+                    truckId: truckId ? Number(truckId) : null,
+                },
+            });
+
+            res.status(200).json(updatedDriver);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: "Failed to update driver" });
         }
     }
+
+    // 🔹 Delete Driver
     static async deleteDriver(req, res) {
         try {
             const { id } = req.params;
-            await prisma.driver.delete({
-                where: { id: Number(id) }
-            });
-            res.json({ Message: 'Driver deleted successfully' });
 
-        }
-        catch (error) {
-            res.status(500).json({ error: 'Failed to delete driver' });
+            await prisma.driver.delete({
+                where: { id: Number(id) },
+            });
+
+            res.status(200).json({ message: "Driver deleted successfully" });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: "Failed to delete driver" });
         }
     }
 }
-export default DriverControlles;
+
+export default DriverController;

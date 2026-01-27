@@ -112,6 +112,14 @@ export const shipmentApi = createApi({
       }),
     }),
 
+    getShipmentByTime: builder.query<any[], string>({
+      query: (range) => ({
+        url: `/getShipmentByTime/${range}`,
+        method: "GET",
+        credentials: "include",
+      }),
+    }),
+
     getAllCreated: builder.query<Shipment[], void>({
       query: () => "/getAllCreated",
       providesTags: ["Shipment"],
@@ -130,5 +138,6 @@ export const {
   useGetAllShipmentsQuery,
   useGetShipmentStatusQuery,
   useGetAllCreatedQuery,
+  useGetShipmentByTimeQuery,
   useGetShipmentQuery,
 } = shipmentApi;

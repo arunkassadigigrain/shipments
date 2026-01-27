@@ -11,7 +11,7 @@ router.patch("/updateTrip/:id", TripController.updateTrip);
 router.delete("/deleteTrip/:id",TripController.deletetrip);
 router.get("/getTrip/:id", TripController.gettrip);
 router.get("/getAllTrips", TripController.getAllTrips);
-
+router.get("/getTripByTime/:range", TripController.getTrips);
 router.get("/getTripsByDateRange/:range", TripController.countTripsStatus);
 
 export default router;

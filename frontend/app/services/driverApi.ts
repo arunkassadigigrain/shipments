@@ -1,10 +1,11 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
  
 interface Driver{
-    id: string
+    id: number
     Drivername: string;
     phoneNumber: string;
     alternatePhoneNumber: string;
+    truckId?: number;
     createdAt: string
     updatedAt: string
 }

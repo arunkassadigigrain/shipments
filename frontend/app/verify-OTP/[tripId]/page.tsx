@@ -309,9 +309,9 @@ export default function TripDetailsPage() {
 
     try {
       await verifyOtp({
-        tripId: actualTripId,
+        tripId: Number(actualTripId),
         shipmentId,
-        enteredOTP: enteredOtp,
+        otpCode: Number(enteredOtp),
       }).unwrap();
 
       toast.success("OTP verified successfully");

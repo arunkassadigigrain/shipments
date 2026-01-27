@@ -20,7 +20,6 @@
 //   COMPLETED: "Completed",
 // };
 
-
 // export default function TripsPieChart({
 //   activeSegment,
 // }: {
@@ -200,7 +199,7 @@
 //             key={item.id}
 //             onMouseEnter={() => setActiveId(item.id)}
 //             onMouseLeave={() => setActiveId(null)}
-//             className={`rounded-xl flex items-center justify-between sm:flex-col sm:justify-center sm:text-center 
+//             className={`rounded-xl flex items-center justify-between sm:flex-col sm:justify-center sm:text-center
 //             }`}
 //           >
 //             <div className="flex items-center gap-1">
@@ -228,8 +227,6 @@
 //   );
 // }
 
-
-
 "use client";
 
 import { ResponsivePie } from "@nivo/pie";
@@ -253,13 +250,14 @@ const STATUS_LABELS: Record<TripStatus, string> = {
 
 export default function TripsPieChart({
   activeSegment,
+  timeRange,
+  setTimeRange,
 }: {
   activeSegment: "trips" | "shipments";
+  timeRange: "day" | "week" | "month" | "quaterly";
+  setTimeRange: (r: "day" | "week" | "month" | "quaterly") => void;
 }) {
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [timeRange, setTimeRange] = useState<
-    "day" | "week" | "month" | "quaterly"
-  >("day");
 
   const tripQuery = useGetTripStatusQuery(timeRange, {
     skip: activeSegment !== "trips",
@@ -297,7 +295,7 @@ export default function TripsPieChart({
 
   const totalCount = useMemo(
     () => data.reduce((sum, d) => sum + d.value, 0),
-    [data]
+    [data],
   );
 
   const hasData = data.some((d) => d.value > 0);
@@ -338,9 +336,11 @@ export default function TripsPieChart({
   return (
     <div className="rounded-xl p-2 sm:p-6 ">
       {/* Header */}
-      <div className="flex flex-row justify-between items-center mb-6 gap-3 h-[80px]">
+      <div className="flex flex-row justify-between items-center mb-6 gap-3 h-[80px] ">
         <div>
-          <h2 className="text-lg sm:text-xl font-bold">{segmentLabel} Status</h2>
+          <h2 className="text-lg sm:text-xl font-bold">
+            {segmentLabel} Status
+          </h2>
           <p className="text-xs sm:text-sm text-gray-500">Current overview</p>
         </div>
 

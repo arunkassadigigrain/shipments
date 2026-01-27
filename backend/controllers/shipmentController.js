@@ -1,5 +1,5 @@
 import prisma from "../config/prisma.js";
-import TimeRange from "../middleware/timerange.js"
+import TimeRange from "../middleware/timerange.js";
 
 class ShipmentController {
   static async createShipment(req, res) {
@@ -83,10 +83,26 @@ class ShipmentController {
             },
           },
           include: {
-            shipmentItems: true,
+            shipmentItems: {
+              include: {
+                item: true,
+              },
+            },
             shippingAddress: true,
+            business: { select: { email: true, contactPersonName: true } }
           },
         });
+
+        try {
+          await emailMiddleware.emailSending(
+            shipment.id,
+            shipment.business.email,
+            shipment.business.contactPersonName,
+            shipment.shipmentItems,
+          );
+        } catch (err) {
+          console.error("Failed to send email:", err);
+        }
 
         return shipment;
       });
@@ -127,8 +143,8 @@ class ShipmentController {
           Status: "CREATED",
         },
         orderBy: {
-        updatedAt: "desc",
-      },
+          updatedAt: "desc",
+        },
         include: {
           business: true,
           shippingAddress: true,
@@ -240,15 +256,39 @@ class ShipmentController {
     }
   };
 
-
-
-
   static getAllShipments = async (req, res) => {
     try {
       const shipments = await prisma.shipment.findMany({
         orderBy: {
-        updatedAt: "desc", 
-      },
+          updatedAt: "desc",
+        },
+        include: {
+          business: true,
+          shipmentItems: true,
+          shippingAddress: true,
+        },
+      });
+      res.status(200).json(shipments);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Failed to fetch shipments" });
+    }
+  };
+
+  static getShipments = async (req, res) => {
+    try {
+      const { range } = req.params;
+      const { startDateUTC, endDateUTC } = TimeRange.getDateRange(range);
+      const shipments = await prisma.shipment.findMany({
+        where: {
+          updatedAt: {
+            gte: startDateUTC,
+            lte: endDateUTC,
+          },
+        },
+        orderBy: {
+          updatedAt: "desc",
+        },
         include: {
           business: true,
           shipmentItems: true,

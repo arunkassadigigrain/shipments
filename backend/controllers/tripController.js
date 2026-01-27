@@ -138,8 +138,8 @@ class TripController {
     try {
       const trips = await prisma.trip.findMany({
         orderBy: {
-        updatedAt: "desc", 
-      },
+          updatedAt: "desc",
+        },
         include: {
           driver: true,
           truck: true,
@@ -172,11 +172,11 @@ class TripController {
 
   static async verifyTripOTP(req, res) {
     try {
-      const { tripId, shipmentId, enteredOTP } = req.body;
-      console.log(tripId, shipmentId, enteredOTP)
-      if (!tripId || !shipmentId || !enteredOTP) {
+      const { tripId, shipmentId, otpCode } = req.body;
+      console.log(tripId, shipmentId, otpCode)
+      if (!tripId || !shipmentId || !otpCode) {
         return res.status(400).json({
-          error: "tripId, shipmentId and enteredOTP are required",
+          error: "tripId, shipmentId and otpCode are required",
         });
       }
 
@@ -211,7 +211,7 @@ class TripController {
       }
 
       // 4️⃣ Compare OTP
-      if (Number(enteredOTP) !== shipmentOtp.otpCode) {
+      if (Number(otpCode) !== shipmentOtp.otpCode) {
         return res.status(400).json({
           error: "Invalid OTP",
         });
@@ -370,6 +370,52 @@ class TripController {
     }
 
   }
+
+  static getTrips = async (req, res) => {
+    try {
+      const { range } = req.params;
+      console.log("i am here")
+      // console.log("222222222222222222222222222222222222222222222222222222222222222222222")
+      const { startDateUTC, endDateUTC } = TimeRange.getDateRange(range);
+      const trips = await prisma.trip.findMany({
+        where: {
+          updatedAt: {
+            gte: startDateUTC,
+            lte: endDateUTC,
+          },
+        },
+        orderBy: {
+          updatedAt: "desc",
+        },
+        include: {
+          driver: true,
+          truck: true,
+
+          tripShipments: {
+            include: {
+              shipment: {
+                include: {
+                  business: true,
+                  shippingAddress: true,
+                  shipmentItems: {
+                    include: {
+                      item: true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      });
+
+      res.status(200).json(trips);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Failed to fetch trips" });
+    }
+  };
+
 
 
 

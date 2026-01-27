@@ -49,26 +49,42 @@ model Business {
 }
 
 model Driver {
-  id                   Int @id @default(autoincrement())
-  Drivername                String
+  id                   Int      @id @default(autoincrement())
+  Drivername           String
   phoneNumber          String
   alternatePhoneNumber String?
+
+
+  truckId              Int?
+  truck                Truck?   @relation("TruckDrivers", fields: [truckId], references: [id])
+
+  defaultForTruck      Truck?   @relation("DefaultDriver")
+
   trips                Trip[]
+
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 }
 
 model Truck {
-  id                   Int @id @default(autoincrement())
-  truckNumber          String 
+  id                   Int      @id @default(autoincrement())
+  truckNumber          String
   truckCapacity        Int
   truckModel           String
   ownerPhoneNumber     String
   alternatePhoneNumber String?
+
+  defaultDriverId      Int?     @unique
+  defaultDriver        Driver?  @relation("DefaultDriver", fields: [defaultDriverId], references: [id])
+
+  drivers              Driver[] @relation("TruckDrivers")
   trips                Trip[]
+
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 }
+
+
 
 model Shipment {
   id                Int @id @default(autoincrement())

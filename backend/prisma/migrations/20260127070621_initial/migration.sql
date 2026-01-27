@@ -58,6 +58,7 @@ CREATE TABLE "Driver" (
     "Drivername" TEXT NOT NULL,
     "phoneNumber" TEXT NOT NULL,
     "alternatePhoneNumber" TEXT,
+    "truckId" INTEGER,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -72,6 +73,7 @@ CREATE TABLE "Truck" (
     "truckModel" TEXT NOT NULL,
     "ownerPhoneNumber" TEXT NOT NULL,
     "alternatePhoneNumber" TEXT,
+    "defaultDriverId" INTEGER,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -143,6 +145,9 @@ CREATE TABLE "TripShipment" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Truck_defaultDriverId_key" ON "Truck"("defaultDriverId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "ShipmentOTP_tripId_shipmentId_key" ON "ShipmentOTP"("tripId", "shipmentId");
 
 -- CreateIndex
@@ -150,6 +155,12 @@ CREATE UNIQUE INDEX "TripShipment_tripId_shipmentId_key" ON "TripShipment"("trip
 
 -- AddForeignKey
 ALTER TABLE "Business" ADD CONSTRAINT "Business_billingAddressId_fkey" FOREIGN KEY ("billingAddressId") REFERENCES "BillingAddress"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Driver" ADD CONSTRAINT "Driver_truckId_fkey" FOREIGN KEY ("truckId") REFERENCES "Truck"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Truck" ADD CONSTRAINT "Truck_defaultDriverId_fkey" FOREIGN KEY ("defaultDriverId") REFERENCES "Driver"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Shipment" ADD CONSTRAINT "Shipment_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Business"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

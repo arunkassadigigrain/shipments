@@ -208,7 +208,7 @@ export default function AddCustomer() {
                             onChange={handleChange}
                             placeholder="e.g. Digi Grain"
                             disabled={isLoading}
-                            className="input input-bordered w-full rounded-2xl bg-base-100/50 border-base-300 focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-300"
+                            className="input input-bordered w-full rounded-2xl bg-base-100/50 border-base-300 focus:border-primary focus:ring-4 outline-none focus:ring-primary/20 transition-all duration-300"
                             required
                           />
                         </div>
@@ -226,7 +226,7 @@ export default function AddCustomer() {
                             onChange={handleChange}
                             placeholder="e.g. Praven Gade"
                             disabled={isLoading}
-                            className="input input-bordered w-full rounded-2xl bg-base-100/50 border-base-300 focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-300"
+                            className="input input-bordered w-full rounded-2xl bg-base-100/50 border-base-300 focus:border-primary outline-none focus:ring-4 focus:ring-primary/20 transition-all duration-300"
                             required
                           />
                         </div>
@@ -244,7 +244,7 @@ export default function AddCustomer() {
                             onChange={handleChange}
                             placeholder="e.g. +91 9392382434"
                             disabled={isLoading}
-                            className="input input-bordered w-full rounded-2xl bg-base-100/50 border-base-300 focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-300"
+                            className="input input-bordered w-full rounded-2xl bg-base-100/50 border-base-300 focus:border-primary outline-none focus:ring-4 focus:ring-primary/20 transition-all duration-300"
                             required
                           />
                         </div>
@@ -262,7 +262,7 @@ export default function AddCustomer() {
                             onChange={handleChange}
                             placeholder="e.g. praveen@digigrain.in"
                             disabled={isLoading}
-                            className="input input-bordered w-full rounded-2xl bg-base-100/50 border-base-300 focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-300"
+                            className="input input-bordered w-full rounded-2xl bg-base-100/50 border-base-300 focus:border-primary outline-none focus:ring-4 focus:ring-primary/20 transition-all duration-300"
                             required
                           />
                         </div>
@@ -291,7 +291,7 @@ export default function AddCustomer() {
                             value={form.billingAddress.addressLine1}
                             onChange={handleAddressChange}
                             disabled={isLoading}
-                            className="textarea textarea-bordered min-h-[100px] resize-none rounded-2xl bg-base-100/50 border-base-300 focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-300"
+                            className="textarea textarea-bordered min-h-[100px] outline-none resize-none rounded-2xl bg-base-100/50 border-base-300 focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-300"
                             placeholder="Street, Building, Area"
                             required
                           />
@@ -308,7 +308,7 @@ export default function AddCustomer() {
                             onChange={handleAddressChange}
                             disabled={isLoading}
                             placeholder="Landmark, Floor (optional)"
-                            className="input input-bordered w-full rounded-2xl bg-base-100/50 border-base-300 focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-300"
+                            className="input input-bordered w-full rounded-2xl outline-none bg-base-100/50 border-base-300 focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-300"
                           />
                         </div>
 
@@ -325,7 +325,7 @@ export default function AddCustomer() {
                             onChange={handleAddressChange}
                             disabled={isLoading}
                             placeholder="e.g. Hyderabad"
-                            className="input input-bordered w-full rounded-2xl bg-base-100/50 border-base-300 focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-300"
+                            className="input input-bordered w-full rounded-2xl outline-none bg-base-100/50 border-base-300 focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-300"
                             required
                           />
                         </div>
@@ -343,7 +343,7 @@ export default function AddCustomer() {
                             onChange={handleAddressChange}
                             disabled={isLoading}
                             placeholder="e.g. Telangana"
-                            className="input input-bordered w-full rounded-2xl bg-base-100/50 border-base-300 focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-300"
+                            className="input input-bordered w-full rounded-2xl outline-none bg-base-100/50 border-base-300 focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-300"
                             required
                           />
                         </div>
@@ -361,7 +361,7 @@ export default function AddCustomer() {
                             onChange={handleAddressChange}
                             disabled={isLoading}
                             placeholder="e.g. 500001"
-                            className="input input-bordered w-full rounded-2xl bg-base-100/50 border-base-300 focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-300"
+                            className="input input-bordered w-full rounded-2xl outline-none bg-base-100/50 border-base-300 focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-300"
                             required
                           />
                         </div>

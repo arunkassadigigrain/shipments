@@ -1,43 +1,3 @@
-// // app/page.tsx  or wherever your Home component lives
-// import { Menu, Package } from "lucide-react";
-// import TripsPieChart from "./components/tripsPieChart";
-// import TripsAndShipments from "./components/trip&shipment";
-
-// export default function Home() {
-//   return (
-//     <div className="flex min-h-screen font-sans bg-base-200">
-//       <div className="drawer lg:drawer-open">
-//         <input id="my-drawer" type="checkbox" className="drawer-toggle" />
-
-//         {/* Drawer Content (main area) */}
-//         <div className="drawer-content flex flex-col">
-
-//           {/* Main content - two column layout on lg+ */}
-//           <div className="p-4 md:p-6 lg:p-8">
-//             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 ">
-//               {/* Left column - Pie Chart (statistics/overview) */}
-//               <div className="lg:col-span-5 xl:col-span-4 hover:shadow-xl rounded-3xl hover:shadow-primary/20 transform hover:-translate-y-0.5 transition-all duration-300">
-//                 <div className="card bg-base-100 shadow-md rounded-3xl p-5 lg:p-6 h-full">
-//                   <div className="min-h-[320px] md:min-h-[380px]">
-//                     <TripsPieChart />
-//                   </div>
-//                 </div>
-//               </div>
-
-//               {/* Right column - Operations / Trips & Shipments */}
-//               <div className="lg:col-span-7 xl:col-span-8">
-//                 <div className="card bg-base-100 shadow-md rounded-3xl p-5 lg:p-6 hover:shadow-2xl hover:shadow-primary/20 transform hover:-translate-y-0.5 transition-all duration-300">
-//                   <h1 className="text-2xl font-bold mb-6">Operations</h1>
-//                   <TripsAndShipments />
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
 
 // app/page.tsx
 "use client";
@@ -50,6 +10,8 @@ import Sidebar from "./components/sidebar";
 export default function Home() {
   // 🔹 MOVE STATE HERE
   const [activeTab, setActiveTab] = useState<"trips" | "shipments">("trips");
+  const [timeRange, setTimeRange] = useState<"day" | "week" | "month" | "quaterly">("day");
+
 
   // return (
   //   <div className="flex min-h-screen font-sans bg-base-200">
@@ -104,14 +66,16 @@ export default function Home() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 h-full">
               {/* LEFT – Pie Chart */}
               <div className="lg:col-span-5 xl:col-span-4">
-                <div className="card bg-base-100 shadow-md rounded-3xl p-5 lg:p-6 h-[680px] flex items-center justify-center">
-                  <TripsPieChart activeSegment={activeTab} />
+                <div className="card shadow-md rounded-3xl p-5 lg:p-6 h-[680px] flex items-center justify-center hover:shadow-primary/20 transform hover:-translate-y-0.5 transition-all duration-300">
+                  <TripsPieChart activeSegment={activeTab}
+                  timeRange={timeRange}
+                  setTimeRange={setTimeRange} />
                 </div>
               </div>
 
               {/* RIGHT – Trips & Shipments */}
               <div className="lg:col-span-7 xl:col-span-8">
-                <div className="card bg-base-100 shadow-md rounded-3xl p-5 lg:p-6 h-[680px] flex flex-col">
+                <div className="card shadow-md rounded-3xl p-5 lg:p-6 h-[680px] flex flex-col hover:shadow-primary/20 transform hover:-translate-y-0.5 transition-all duration-300">
                   {/* Fixed Header */}
                   <h1 className="text-2xl font-bold mb-4 shrink-0">
                     Operations
@@ -122,6 +86,7 @@ export default function Home() {
                     <TripsAndShipments
                       activeTab={activeTab}
                       setActiveTab={setActiveTab}
+                      timeRange={timeRange}
                     />
                   </div>
                 </div>
