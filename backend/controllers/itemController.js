@@ -5,8 +5,9 @@ class ItemController {
 
     static getAllItems = async (req, res) => {
         try {
-            const items = await prisma.item.findMany();
-            // sendWhatsAppTemplate.sendWhatsAppTemplate("919392382434", "praveen");
+            const items = await prisma.item.findMany({where: {
+                    tenantId: req.user.id,
+                 },});
             res.status(200).json(items);
         } catch (error) {
             console.error(error);
@@ -19,7 +20,9 @@ class ItemController {
             const { id } = req.params;
 
             const item = await prisma.item.findUnique({
-                where: { id: Number(id) },
+                where: { id: Number(id),
+                    tenantId: req.user.id,
+                 },
             });
 
             if (!item) {
@@ -36,19 +39,20 @@ class ItemController {
     static createItem = async (req, res) => {
         try {
             const { packingType, itemVariety, itemName } = req.body;
-            console.log(req.body);
+
             if (!itemName || !packingType || !itemVariety) {
                 return res.status(400).json({ error: "All fields are required" });
             }
             let Description = itemName + " of " + packingType + " with " + itemVariety;
 
-
+            console.log(req.user.id, "11111111111111111111111111111111");
             const newItem = await prisma.item.create({
                 data: {
                     itemName,
                     itemDescription: Description,
                     packingType,
                     itemVariety,
+                    tenantId: req.user.id,
                 },
             });
 
@@ -73,7 +77,9 @@ class ItemController {
             }
 
             const updatedItem = await prisma.item.update({
-                where: { id: Number(id) },
+                where: { id: Number(id),
+                    tenantId: req.user.id,
+                 },
                 data: {
                     itemName,
                     itemDescription,

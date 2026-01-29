@@ -6,6 +6,7 @@ generator client {
 }
 model Item {
   id              Int @id @default(autoincrement())
+  tenantId         Int
   itemName        String
   itemVariety     String
   packingType     String
@@ -17,6 +18,7 @@ model Item {
 
 model BillingAddress {
   id              Int @id @default(autoincrement())
+  tenantId        Int
   addressLine1    String
   addressLine2    String?
   cityOrDistrict  String
@@ -27,6 +29,7 @@ model BillingAddress {
 
 model ShippingAddress {
   id              Int @id @default(autoincrement())
+  tenantId        Int
   addressLine1    String
   addressLine2    String?
   cityOrDistrict  String
@@ -37,6 +40,7 @@ model ShippingAddress {
 
 model Business {
   id                Int @id @default(autoincrement())
+  tenantId        Int
   businessName      String
   contactPersonName String
   phoneNumber       String
@@ -53,7 +57,7 @@ model Driver {
   Drivername           String
   phoneNumber          String
   alternatePhoneNumber String?
-
+  tenantId        Int
 
   truckId              Int?
   truck                Truck?   @relation("TruckDrivers", fields: [truckId], references: [id])
@@ -68,6 +72,7 @@ model Driver {
 
 model Truck {
   id                   Int      @id @default(autoincrement())
+  tenantId        Int
   truckNumber          String
   truckCapacity        Int
   truckModel           String
@@ -88,6 +93,7 @@ model Truck {
 
 model Shipment {
   id                Int @id @default(autoincrement())
+  tenantId        Int
   shipmentDate      DateTime @default(now())
   businessId        Int
   business          Business @relation(fields: [businessId], references: [id])
@@ -104,6 +110,7 @@ model Shipment {
 
 model ShipmentItem {
   id          Int @id @default(autoincrement())
+  tenantId        Int
   shipmentId Int
   shipment   Shipment @relation(fields: [shipmentId], references: [id])
   itemId     Int
@@ -117,7 +124,7 @@ model ShipmentItem {
 model Trip {
   id           Int @id @default(autoincrement())
   tripDate     DateTime @default(now())
-
+  tenantId        Int
   Status       Status @default(ONTHEWAY)
   driverId     Int
   driver       Driver @relation(fields: [driverId], references: [id])
@@ -132,7 +139,7 @@ model Trip {
 
 model ShipmentOTP {
   id          Int      @id @default(autoincrement())
-
+  tenantId        Int
   tripId      Int
   trip        Trip     @relation(fields: [tripId], references: [id])
 
@@ -153,7 +160,7 @@ model ShipmentOTP {
 
 model TripShipment {
   id          Int @id @default(autoincrement())
-
+  tenantId        Int
   tripId      Int
   trip        Trip @relation(fields: [tripId], references: [id])
 
@@ -166,10 +173,29 @@ model TripShipment {
 }
 
 
-
-
 enum Status {
   CREATED
   ONTHEWAY
   COMPLETED
+}
+
+
+
+model User {
+  id        Int      @id @default(autoincrement())
+  tenantId  Int?     // optional: useful if you later scope data per tenant
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(ADMIN)
+  
+  isActive  Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+  USER
 }

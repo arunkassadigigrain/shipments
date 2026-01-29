@@ -25,6 +25,7 @@ class BusinessController {
           cityOrDistrict: billingAddress.cityOrDistrict,
           stateOrProvince: billingAddress.stateOrProvince,
           postalCode: Number(billingAddress.postalCode),
+          tenantId:req.user.id,
         },
       });
 
@@ -35,6 +36,7 @@ class BusinessController {
           phoneNumber,
           email,
           billingAddressId: address.id,
+          tenantId:req.user.id,
         },
       });
 
@@ -48,6 +50,9 @@ class BusinessController {
   static getAllBusinesses = async (req, res) => {
     try {
       const businesses = await prisma.business.findMany({
+        where: {
+        tenantId: req.user.id,   // 👈 Filter by logged-in user
+      },
         include: {
           billingAddress: true,
         },
@@ -65,7 +70,10 @@ class BusinessController {
       const { id } = req.params;
 
       const business = await prisma.business.findUnique({
-        where: { id: Number(id) },
+         where: {
+          id: Number(id) ,
+          tenantId:req.user.id,
+          },
         include: {
           billingAddress: true,
         },
@@ -93,7 +101,9 @@ class BusinessController {
       } = req.body;
 
       const business = await prisma.business.update({
-        where: { id: Number(id) },
+        where: { id: Number(id),
+          tenantId:req.user.id,
+         },
         data: {
           businessName,
           contactPersonName,

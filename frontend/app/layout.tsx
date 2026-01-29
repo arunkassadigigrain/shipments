@@ -75,10 +75,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import ThemeProvider from "@/app/components/ThemeProvider";
+import ThemeProvider from "@/app/admin/components/ThemeProvider";
 import { Providers } from "@/app/providers";
 import { ToastContainer } from "react-toastify";
-import Sidebar from "@/app/components/sidebar";
+import Sidebar from "@/app/admin/components/sidebar";
 import { Menu } from "lucide-react";
 
 const geistSans = Geist({

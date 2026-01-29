@@ -8,6 +8,9 @@ class DriverController {
     static async getAllDrivers(req, res) {
         try {
             const drivers = await prisma.driver.findMany({
+                where: {
+                    tenantId: req.user.id,
+                 },
                 include: {
                     truck: true,
                 },
@@ -34,6 +37,7 @@ class DriverController {
                 data: {
                     Drivername,
                     phoneNumber,
+                    tenantId:req.user.id, 
                     alternatePhoneNumber,
                     truckId: truckId ? Number(truckId) : null,
                 },
@@ -58,7 +62,9 @@ class DriverController {
             } = req.body;
 
             const updatedDriver = await prisma.driver.update({
-                where: { id: Number(id) },
+                where: { id: Number(id),
+                    tenantId:req.user.id,
+                 },
                 data: {
                     driverName,
                     phoneNumber,

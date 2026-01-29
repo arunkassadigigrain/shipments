@@ -1,11 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { setupListeners } from '@reduxjs/toolkit/query'
-import { itemApi } from './services/itemApi'
-import { customerApi } from './services/customerApi'
-import { truckApi } from './services/truckApi'
-import { driverApi } from './services/driverApi'
-import { tripsApi } from './services/tripApi'
-import { shipmentApi } from './services/shipmentApi'
+import { itemApi } from './admin/services/itemApi'
+import { customerApi } from './admin/services/customerApi'
+import { truckApi } from './admin/services/truckApi'
+import { driverApi } from './admin/services/driverApi'
+import { tripsApi } from './admin/services/tripApi'
+import { shipmentApi } from './admin/services/shipmentApi'
+import { authApi } from './admin/services/userApi'
 
 export const store = configureStore({
   reducer: {
@@ -15,9 +16,10 @@ export const store = configureStore({
     [driverApi.reducerPath]: driverApi.reducer,
     [tripsApi.reducerPath]: tripsApi.reducer,
     [shipmentApi.reducerPath]: shipmentApi.reducer,
+    [authApi.reducerPath]: authApi.reducer,
   },
   middleware: (getDefaultMiddleware) => 
-    getDefaultMiddleware().concat(itemApi.middleware, customerApi.middleware, truckApi.middleware, driverApi.middleware, tripsApi.middleware, shipmentApi.middleware),
+    getDefaultMiddleware().concat(itemApi.middleware, customerApi.middleware, truckApi.middleware, driverApi.middleware, tripsApi.middleware, shipmentApi.middleware, authApi.middleware),
 })
 
 setupListeners(store.dispatch);

@@ -8,6 +8,7 @@ import driverRoutes from "./routes/driverRoutes.js";
 import truckRoutes from "./routes/truckRoutes.js";
 import shipmentRoutes from "./routes/shipmentRoutes.js";
 import tripRoutes from "./routes/tripRoutes.js";
+import userRoutes from "./routes/tempUserRoutes.js";
 dotenv.config();
 
 const app = express();
@@ -21,6 +22,7 @@ app.use("/api/drivers", driverRoutes);
 app.use("/api/trucks", truckRoutes);
 app.use("/api/shipments", shipmentRoutes);
 app.use("/api/trips", tripRoutes); // Note: This seems to be a duplicate route, consider changing if needed.
+app.use("/api/users", userRoutes);
 
 
 const PORT = process.env.PORT || 8000;

@@ -13,7 +13,7 @@ class ShipmentController {
       const itemIds = items.map((i) => Number(i.itemId));
 
       const existingItems = await prisma.item.findMany({
-        where: { id: { in: itemIds } },
+        where: { id: { in: itemIds }, tenantId: req.user.id },
         select: { id: true },
       });
 
@@ -29,7 +29,7 @@ class ShipmentController {
 
       if (addressBar === true) {
         const business = await prisma.business.findUnique({
-          where: { id: Number(businessId) },
+          where: { id: Number(businessId), tenantId: req.user.id },
           include: { billingAddress: true },
         });
 
@@ -53,6 +53,7 @@ class ShipmentController {
             cityOrDistrict: finalShippingAddress.cityOrDistrict,
             stateOrProvince: finalShippingAddress.stateOrProvince,
             postalCode: Number(finalShippingAddress.postalCode),
+            tenantId: req.user.id,
           },
         });
 
@@ -70,6 +71,7 @@ class ShipmentController {
             quantity,
             itemRate,
             subtotal,
+            tenantId,
           };
         });
 
@@ -81,6 +83,7 @@ class ShipmentController {
             shipmentItems: {
               create: shipmentItems,
             },
+             tenantId: req.user.id,
           },
           include: {
             shipmentItems: {
@@ -121,7 +124,7 @@ class ShipmentController {
       const { id } = req.params;
 
       const shipments = await prisma.shipment.findMany({
-        where: id ? { businessId: Number(id) } : {},
+        where: id ? { businessId: Number(id), tenantId: req.user.id, } : {},
         include: {
           business: true,
           shipmentItems: true,
@@ -140,6 +143,7 @@ class ShipmentController {
     try {
       const shipments = await prisma.shipment.findMany({
         where: {
+          tenantId: req.user.id,
           Status: "CREATED",
         },
         orderBy: {
@@ -183,6 +187,7 @@ class ShipmentController {
 
       const shipments = await prisma.shipment.findMany({
         where: {
+          tenantId: req.user.id,
           updatedAt: {
             gte: startDateUTC,
             lte: endDateUTC,
@@ -259,6 +264,9 @@ class ShipmentController {
   static getAllShipments = async (req, res) => {
     try {
       const shipments = await prisma.shipment.findMany({
+        where:{
+            tenantId: req.user.id,
+          },
         orderBy: {
           updatedAt: "desc",
         },

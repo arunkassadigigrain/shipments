@@ -263,7 +263,7 @@ import { useState, useMemo } from "react";
 import {
   useGetTripQuery,
   useVerifyTripOTPMutation,
-} from "@/app/services/tripApi";
+} from "@/app/admin/services/tripApi";
 import { toast } from "react-toastify";
 import {
   Loader2,

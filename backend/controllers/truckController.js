@@ -5,6 +5,9 @@ class TruckController {
     static async getAllTruck(req, res) {
         try {
             const trucks = await prisma.truck.findMany({
+                where: {
+                    tenantId: req.user.id,
+                },
                 include: {
                     defaultDriver: true, // ✅ relation
                 },
@@ -21,7 +24,7 @@ class TruckController {
             const { id } = req.params;
 
             const truck = await prisma.truck.findUnique({
-                where: { id: Number(id) },
+                where: { id: Number(id)},
             });
 
             if (!truck) {
@@ -54,7 +57,8 @@ class TruckController {
                     truckModel,
                     defaultDriverId,
                     ownerPhoneNumber,
-                    alternatePhoneNumber
+                    alternatePhoneNumber,
+                    tenantId: req.user.id,
                 }
             });
 
@@ -79,13 +83,14 @@ class TruckController {
             } = req.body;
 
             const updatedTruck = await prisma.truck.update({
-                where: { id: Number(id) },
+                where: { id: Number(id), tenantId: req.user.id },
                 data: {
                     truckNumber,
                     truckCapacity,
                     truckModel,
                     ownerPhoneNumber,
-                    alternatePhoneNumber
+                    alternatePhoneNumber,
+                    tenantId: req.user.id,
                 }
             });
 

@@ -34,13 +34,14 @@ class TripController {
             Status: "ONTHEWAY",
             driver: { connect: { id: Number(driverId) } },
             truck: { connect: { id: Number(truckId) } },
+            tenantId: req.user.id,
           },
         });
 
         // 2️⃣ Update Shipments
         await tx.shipment.updateMany({
           where: {
-            id: { in: shipmentIds.map(Number) },
+            id: { in: shipmentIds.map(Number),  tenantId: req.user.id, },
           },
           data: { Status: "ONTHEWAY" },
         });
@@ -50,6 +51,7 @@ class TripController {
           data: shipmentIds.map((id) => ({
             tripId: trip.id,
             shipmentId: Number(id),
+             tenantId: req.user.id,
           })),
         });
 
@@ -63,6 +65,7 @@ class TripController {
             tripId: trip.id,
             shipmentId: item.shipmentId,
             otpCode: item.otpCode,
+             tenantId: req.user.id,
             expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
           })),
         });
@@ -71,7 +74,7 @@ class TripController {
         // 5️⃣ Fetch business details
         const shipmentsWithBusiness = await tx.shipment.findMany({
           where: {
-            id: { in: shipmentIds.map(Number) },
+            id: { in: shipmentIds.map(Number), tenantId: req.user.id },
           },
           select: {
             id: true,
@@ -137,6 +140,9 @@ class TripController {
   static getAllTrips = async (req, res) => {
     try {
       const trips = await prisma.trip.findMany({
+        where:{
+          tenantId: req.user.id,
+        },
         orderBy: {
           updatedAt: "desc",
         },
@@ -279,7 +285,7 @@ class TripController {
       if (!trip) return res.status(404).json({ error: "Trip not found" });
 
       const updatedTrip = await prisma.trip.update({
-        where: { id: Number(id) },
+        where: { id: Number(id), tenantId: req.user.id, },
         data: {
           tripDate: tripDate ? new Date(tripDate) : trip.tripDate,
           driverId: driverId ? Number(driverId) : trip.driverId,
@@ -336,7 +342,7 @@ class TripController {
     try {
       const { id } = req.params;
       const trip = await prisma.trip.findUnique({
-        where: { id: Number(id) },
+        where: { id: Number(id), tenantId: req.user.id, },
         include: {
           driver: true,
           truck: true,
@@ -375,10 +381,10 @@ class TripController {
     try {
       const { range } = req.params;
       console.log("i am here")
-      // console.log("222222222222222222222222222222222222222222222222222222222222222222222")
       const { startDateUTC, endDateUTC } = TimeRange.getDateRange(range);
       const trips = await prisma.trip.findMany({
         where: {
+          tenantId: req.user.id,
           updatedAt: {
             gte: startDateUTC,
             lte: endDateUTC,
@@ -428,6 +434,7 @@ class TripController {
 
       const trips = await prisma.trip.findMany({
         where: {
+          tenantId: req.user.id,
           updatedAt: {
             gte: startDateUTC,
             lte: endDateUTC,
