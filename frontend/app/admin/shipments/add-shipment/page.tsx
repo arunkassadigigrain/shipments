@@ -1,11 +1,10 @@
 "use client";
-import { Menu, Truck, Plus, Trash2 } from "lucide-react";
+import { Menu, Truck, Plus, Trash2, AlertCircle, Ship } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import Select from "react-select";
 import { useGetAllItemsQuery } from "@/app/admin/services/itemApi";
 import { useGetAllCustomerQuery } from "@/app/admin/services/customerApi";
 import { useCreateShipmentMutation } from "@/app/admin/services/shipmentApi";
-import { toast } from "react-toastify";
 import Sidebar from "@/app/admin/components/sidebar";
 
 export default function AddShipment() {
@@ -13,7 +12,7 @@ export default function AddShipment() {
   const { data: businesses = [], isLoading: businessesLoading } =
     useGetAllCustomerQuery();
 
-  const [createShipment, { isLoading: isSubmitting }] =
+  const [createShipment, { isLoading: isSubmitting, isError, error }] =
     useCreateShipmentMutation();
 
   const [selectedBusinessId, setSelectedBusinessId] = useState("");
@@ -23,6 +22,9 @@ export default function AddShipment() {
   const [contactPersonName, setContactPersonName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  // const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const [billingAddress, setBillingAddress] = useState({
     addressLine1: "",
@@ -140,17 +142,36 @@ export default function AddShipment() {
       }),
     );
   };
+  const parts = [
+    billingAddress.addressLine1,
+    billingAddress.cityOrDistrict,
+    billingAddress.stateOrProvince,
+    billingAddress.postalCode,
+  ].filter(Boolean);
+
+  let fullBillingAddress = "";
+
+  if (parts.length === 1) {
+    fullBillingAddress = parts[0];
+  } else if (parts.length === 3) {
+    fullBillingAddress = parts.join(" and ");
+  } else if (parts.length > 3) {
+    fullBillingAddress =
+      parts.slice(0, -1).join(", ") + parts[parts.length - 1];
+  }
+
+  console.log(fullBillingAddress);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!selectedBusinessId) {
-      toast.error("Business Deatils missing");
+      setErrorMessage("Business details are missing");
       return;
     }
 
     if (rows.some((r) => !r.itemId || r.quantity < 1 || !r.itemRate)) {
-      toast.error("Item details are missing");
+      setErrorMessage("Item details are missing");
       return;
     }
 
@@ -176,24 +197,49 @@ export default function AddShipment() {
     };
 
     try {
-      await createShipment(payload).unwrap();
-      toast.success("Truck details created successfully");
+      const response = await createShipment(payload).unwrap();
+
+      setSuccessMessage(
+        ` created successfully. Total ₹${totalAmount.toFixed(2)}`,
+      );
+
       setSelectedBusinessId("");
       setRows([{ itemId: "", quantity: 1, itemRate: "", subtotal: 0 }]);
       setIsShippingSameAsBilling(true);
     } catch (err: any) {
-      toast.error(
-        err?.data?.message || "Failed to create truck. Please try again.",
+      setErrorMessage(
+        err?.data?.message || "Failed to create shipment. Please try again.",
       );
     }
   };
-
 
   return (
     <div className="drawer lg:drawer-open min-h-screen">
       <Sidebar />
       <div className="drawer-content flex flex-col bg-base-200">
+        {successMessage && (
+          <div className="fixed inset-0 flex items-center justify-center z-50">
+            <div className="bg-green-100 border border-green-400 text-green-800 p-6 rounded-2xl shadow-lg max-w-sm w-full flex flex-col items-center relative z-50">
+              <div className="text-lg font-semibold mb-2">
+                ✅ Shipment Created Successfully
+              </div>
 
+              <div className="text-sm mb-4 text-center">{successMessage}</div>
+
+              <button
+                className="bg-green-200 hover:bg-green-300 text-green-800 font-bold px-4 py-2 rounded-lg"
+                onClick={() => setSuccessMessage(null)}
+              >
+                Close
+              </button>
+            </div>
+
+            <div
+              className="absolute inset-0 bg-black/30"
+              onClick={() => setSuccessMessage(null)}
+            />
+          </div>
+        )}
 
         <div className="flex-1 px-4 py-4 md:px-6 lg:px-8 overflow-y-auto">
           <div className="max-w-6xl mx-auto">
@@ -218,31 +264,42 @@ export default function AddShipment() {
                   </div>
                 ) : (
                   <form className="space-y-8" onSubmit={handleSubmit}>
+                    {isError && (
+                      <div className="alert alert-error shadow-lg rounded-2xl">
+                        <AlertCircle className="w-6 h-6" />
+                        <span>
+                          {error &&
+                          "data" in error &&
+                          (error.data as any)?.message
+                            ? (error.data as any).message
+                            : "Failed to create truck. Please check the details."}
+                        </span>
+                      </div>
+                    )}
                     {/* Shipment Information */}
                     <div>
-                      <h2 className="text-lg font-semibold text-base-content/90 mb-6 flex items-center gap-2">
-                        <Truck className="w-5 h-5 text-primary" />
-                        Shipment Information
-                      </h2>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="form-control">
-                          <label className="label py-1">
-                            <span className="label-text font-medium text-sm">
-                              Shipment Date
-                              <span className="text-red-500 ml-1">*</span>
-                            </span>
-                          </label>
-                          <input
-                            type="date"
-                            value={today}
-                            readOnly
-                            className="input input-bordered w-full rounded-2xl bg-base-100/50 border-base-300 focus:border-primary focus:ring-4 focus:ring-primary/20 outline-none transition-all duration-300 cursor-not-allowed"
-                          />
-                        </div>
+                      <h2 className="text-m sm:text-lg font-semibold text-base-content/90 flex items-center justify-between">
+                        <span className="flex items-center gap-2">
+                          <Truck className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                          Shipment Information
+                        </span>
 
+                        <span className="text-m sm:text-sm md:text-base text-purple-600 font-medium flex items-center gap-1.5">
+                          📅{" "}
+                          {`${new Date().getDate()}/${new Date().toLocaleString(
+                            "en-GB",
+                            {
+                              month: "short",
+                            },
+                          )}/${new Date().getFullYear()}`}
+                        </span>
+                      </h2>
+                    </div>
+                    <div>
+                      <div className="sm:w-[360px] md:w-[360px] lg:w-[360 px] ">
                         <div className="form-control">
-                          <label className="label py-1">
-                            <span className="label-text font-medium text-sm">
+                          <label className="label ">
+                            <span className="label-text font-medium text-sm pb-2">
                               Business Name
                               <span className="text-red-500 ml-1">*</span>
                             </span>
@@ -252,6 +309,7 @@ export default function AddShipment() {
                             unstyled
                             isSearchable
                             isClearable
+                            required
                             isDisabled={isSubmitting}
                             placeholder="- Search customer..."
                             options={businessOptions}
@@ -261,14 +319,21 @@ export default function AddShipment() {
                                 (option) => option.value === selectedBusinessId,
                               ) || null
                             }
+                            menuPosition="fixed"
+                            menuPlacement="auto"
+                            menuPortalTarget={
+                              typeof window !== "undefined"
+                                ? document.body
+                                : null
+                            }
                             onChange={handleBusinessChange}
                             classNames={{
                               control: ({ isFocused }) =>
-                                `select select-bordered w-full rounded-2xl
-       bg-base-100/50 border-base-300
-       transition-all duration-300
-       ${isFocused ? "border-primary ring-4 ring-primary/20" : ""}`,
-
+                                `input input-bordered w-full outline-none rounded-2xl bg-base-100/50 border-base-300 transition-all duration-300 ${
+                                  isFocused
+                                    ? "border-primary ring-4 ring-primary/20"
+                                    : ""
+                                }`,
                               valueContainer: () => "px-3",
                               input: () => "text-sm",
                               placeholder: () => "text-sm text-base-content/60",
@@ -276,9 +341,9 @@ export default function AddShipment() {
                               menu: () =>
                                 "mt-2 rounded-xl border border-base-300 bg-base-100 shadow-lg",
                               option: ({ isFocused, isSelected }) =>
-                                `px-3 py-2 cursor-pointer text-sm
-       ${isFocused ? "bg-base-200" : ""}
-       ${isSelected ? "bg-primary text-primary-content" : ""}`,
+                                `px-3 py-2 cursor-pointer text-sm ${
+                                  isFocused ? "bg-base-200" : ""
+                                } ${isSelected ? "bg-primary text-primary-content" : ""}`,
                             }}
                           />
                         </div>
@@ -287,13 +352,8 @@ export default function AddShipment() {
 
                     {/* Customer Details - Read-only when selected */}
                     <div>
-                      <h2 className="text-lg font-semibold text-base-content/90 mb-6 flex items-center gap-2">
+                      <h2 className="text-lg font-semibold text-base-content/90 mb-3 flex items-center gap-2">
                         Customer Details
-                        {isBusinessSelected && (
-                          <span className="text-xs font-normal text-base-content/50 ml-2">
-                            (Auto-filled & locked)
-                          </span>
-                        )}
                       </h2>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div className="form-control">
@@ -310,7 +370,7 @@ export default function AddShipment() {
                             onChange={(e) =>
                               setContactPersonName(e.target.value)
                             }
-                            className={`input input-bordered w-full rounded-2xl border-base-300 transition-all duration-300 outline-none ${
+                            className={`input input-bordered w-full cursor-not-allowed rounded-2xl border-base-300 transition-all duration-300 outline-none ${
                               isBusinessSelected
                                 ? "bg-neutral/10 text-base-content/70 cursor-not-allowed"
                                 : "bg-base-100/50 focus:border-primary focus:ring-4 focus:ring-primary/20"
@@ -330,7 +390,7 @@ export default function AddShipment() {
                             value={email}
                             readOnly
                             onChange={(e) => setEmail(e.target.value)}
-                            className={`input input-bordered w-full rounded-2xl border-base-300 transition-all duration-300 outline-none ${
+                            className={`input input-bordered w-full cursor-not-allowed rounded-2xl border-base-300 transition-all duration-300 outline-none ${
                               isBusinessSelected
                                 ? "bg-neutral/10 text-base-content/70 cursor-not-allowed"
                                 : "bg-base-100/50 focus:border-primary focus:ring-4 focus:ring-primary/20"
@@ -351,7 +411,7 @@ export default function AddShipment() {
                             readOnly
                             value={phoneNumber}
                             onChange={(e) => setPhoneNumber(e.target.value)}
-                            className={`input input-bordered w-full rounded-2xl border-base-300 transition-all duration-300 outline-none ${
+                            className={`input input-bordered w-full cursor-not-allowed rounded-2xl border-base-300 transition-all duration-300 outline-none ${
                               isBusinessSelected
                                 ? "bg-neutral/10 text-base-content/70 cursor-not-allowed"
                                 : "bg-base-100/50 focus:border-primary focus:ring-4 focus:ring-primary/20"
@@ -365,24 +425,21 @@ export default function AddShipment() {
 
                     {/* Billing Address - Read-only when selected */}
                     <div>
-                      <h2 className="text-lg font-semibold text-base-content/90 mb-6 flex items-center gap-2">
+                      <h2 className="text-lg font-semibold text-base-content/90 mb-3 flex items-center gap-2">
                         Billing Address
-                        {isBusinessSelected && (
-                          <span className="text-xs font-normal text-base-content/50 ml-2">
-                            (Auto-filled & locked)
-                          </span>
-                        )}
                       </h2>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="form-control md:col-span-2">
-                          <label className="label py-1">
+                      <div className="form-control md:col-span-2 flex gap-4">
+                        {/* Address Line 1 */}
+                        <div className="flex-1">
+                          <label className="label ">
                             <span className="label-text font-medium text-sm">
                               Address Line 1
                               <span className="text-red-500 ml-1 mr-2">*</span>
                             </span>
                           </label>
-                          <textarea
-                            value={billingAddress.addressLine1}
+                          <input
+                            type="text"
+                            value={fullBillingAddress}
                             readOnly
                             onChange={(e) =>
                               setBillingAddress((prev) => ({
@@ -390,7 +447,7 @@ export default function AddShipment() {
                                 addressLine1: e.target.value,
                               }))
                             }
-                            className={`textarea textarea-bordered min-h-[64px] resize-none rounded-2xl border-base-300 outline-none transition-all duration-300 ${
+                            className={`input input-bordered w-full cursor-not-allowed rounded-2xl border-base-300 transition-all duration-300 outline-none ${
                               isBusinessSelected
                                 ? "bg-neutral/10 text-base-content/70 cursor-not-allowed"
                                 : "bg-base-100/50 focus:border-primary focus:ring-4 focus:ring-primary/20"
@@ -399,105 +456,29 @@ export default function AddShipment() {
                             disabled={isBusinessSelected || isSubmitting}
                           />
                         </div>
-                        <div className="form-control">
-                          <label className="label py-1">
+
+                        {/* Address Line 2 */}
+                        <div className="flex-1">
+                          <label className="label ">
                             <span className="label-text font-medium text-sm">
                               Address Line 2
                             </span>
                           </label>
                           <input
                             type="text"
-                            readOnly
                             value={billingAddress.addressLine2}
+                            readOnly
                             onChange={(e) =>
                               setBillingAddress((prev) => ({
                                 ...prev,
                                 addressLine2: e.target.value,
                               }))
                             }
-                            className={`input input-bordered w-full rounded-2xl border-base-300 transition-all duration-300 outline-none ${
+                            className={`input input-bordered w-full cursor-not-allowed rounded-2xl border-base-300 transition-all duration-300 outline-none ${
                               isBusinessSelected
                                 ? "bg-neutral/10 text-base-content/70 cursor-not-allowed"
                                 : "bg-base-100/50 focus:border-primary focus:ring-4 focus:ring-primary/20"
                             }`}
-                            disabled={isBusinessSelected || isSubmitting}
-                          />
-                        </div>
-                        <div className="form-control">
-                          <label className="label py-1">
-                            <span className="label-text font-medium text-sm">
-                              City / District
-                              <span className="text-red-500 ml-1">*</span>
-                            </span>
-                          </label>
-                          <input
-                            type="text"
-                            readOnly
-                            value={billingAddress.cityOrDistrict}
-                            onChange={(e) =>
-                              setBillingAddress((prev) => ({
-                                ...prev,
-                                cityOrDistrict: e.target.value,
-                              }))
-                            }
-                            className={`input input-bordered w-full rounded-2xl border-base-300 transition-all duration-300 outline-none ${
-                              isBusinessSelected
-                                ? "bg-neutral/10 text-base-content/70 cursor-not-allowed"
-                                : "bg-base-100/50 focus:border-primary focus:ring-4 focus:ring-primary/20"
-                            }`}
-                            required
-                            disabled={isBusinessSelected || isSubmitting}
-                          />
-                        </div>
-                        <div className="form-control">
-                          <label className="label py-1">
-                            <span className="label-text font-medium text-sm">
-                              State / Province
-                              <span className="text-red-500 ml-1">*</span>
-                            </span>
-                          </label>
-                          <input
-                            type="text"
-                            readOnly
-                            value={billingAddress.stateOrProvince}
-                            onChange={(e) =>
-                              setBillingAddress((prev) => ({
-                                ...prev,
-                                stateOrProvince: e.target.value,
-                              }))
-                            }
-                            className={`input input-bordered w-full rounded-2xl border-base-300 transition-all duration-300 outline-none ${
-                              isBusinessSelected
-                                ? "bg-neutral/10 text-base-content/70 cursor-not-allowed"
-                                : "bg-base-100/50 focus:border-primary focus:ring-4 focus:ring-primary/20"
-                            }`}
-                            required
-                            disabled={isBusinessSelected || isSubmitting}
-                          />
-                        </div>
-                        <div className="form-control">
-                          <label className="label py-1">
-                            <span className="label-text font-medium text-sm">
-                              Postal Code
-                              <span className="text-red-500 ml-1">*</span>
-                            </span>
-                          </label>
-                          <input
-                            type="text"
-                            readOnly
-                            value={billingAddress.postalCode}
-                            onChange={(e) =>
-                              setBillingAddress((prev) => ({
-                                ...prev,
-                                postalCode: e.target.value,
-                              }))
-                            }
-                            className={`input input-bordered w-full rounded-2xl border-base-300 transition-all duration-300 outline-none ${
-                              isBusinessSelected
-                                ? "bg-neutral/10 text-base-content/70 cursor-not-allowed"
-                                : "bg-base-100/50 focus:border-primary focus:ring-4 focus:ring-primary/20"
-                            }`}
-                            required
                             disabled={isBusinessSelected || isSubmitting}
                           />
                         </div>
@@ -525,12 +506,12 @@ export default function AddShipment() {
                     {/* Shipping Address */}
                     {!isShippingSameAsBilling && (
                       <div>
-                        <h2 className="text-lg font-semibold text-base-content/90 mb-6 flex items-center gap-2">
+                        <h2 className="text-lg font-semibold text-base-content/90 mb-3 flex items-center gap-2">
                           Shipping Address
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="form-control md:col-span-2">
-                            <label className="label py-1">
+                            <label className="label ">
                               <span className="label-text font-medium text-sm">
                                 Address Line 1
                                 <span className="text-red-500 ml-1 mr-2">
@@ -538,7 +519,8 @@ export default function AddShipment() {
                                 </span>
                               </span>
                             </label>
-                            <textarea
+                            <input
+                              type="text"
                               value={shippingAddress.addressLine1}
                               onChange={(e) =>
                                 setShippingAddress((prev) => ({
@@ -546,13 +528,14 @@ export default function AddShipment() {
                                   addressLine1: e.target.value,
                                 }))
                               }
-                              className="textarea textarea-bordered min-h-[64px] resize-none rounded-2xl bg-base-100/50 outline-none border-base-300 focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-300"
+                              className="input input-bordered  rounded-2xl bg-base-100/50 border-base-300 focus:border-primary outline-none focus:ring-4 focus:ring-primary/20 transition-all duration-300"
+                              // className="textarea textarea-bordered min-h-[px] resize-none rounded-2xl bg-base-100/50 outline-none border-base-300 focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-300"
                               required
                               disabled={isSubmitting}
                             />
                           </div>
                           <div className="form-control">
-                            <label className="label py-1">
+                            <label className="label ">
                               <span className="label-text font-medium text-sm">
                                 Address Line 2
                               </span>
@@ -571,7 +554,7 @@ export default function AddShipment() {
                             />
                           </div>
                           <div className="form-control">
-                            <label className="label py-1">
+                            <label className="label ">
                               <span className="label-text font-medium text-sm">
                                 City / District
                                 <span className="text-red-500 ml-1">*</span>
@@ -592,7 +575,7 @@ export default function AddShipment() {
                             />
                           </div>
                           <div className="form-control">
-                            <label className="label py-1">
+                            <label className="label ">
                               <span className="label-text font-medium text-sm">
                                 State / Province
                                 <span className="text-red-500 ml-1">*</span>
@@ -613,7 +596,7 @@ export default function AddShipment() {
                             />
                           </div>
                           <div className="form-control">
-                            <label className="label py-1">
+                            <label className="label ">
                               <span className="label-text font-medium text-sm">
                                 Postal Code
                                 <span className="text-red-500 ml-1">*</span>
@@ -622,6 +605,7 @@ export default function AddShipment() {
                             <input
                               type="text"
                               value={shippingAddress.postalCode}
+                              onWheel={(e) => e.currentTarget.blur()}
                               onChange={(e) =>
                                 setShippingAddress((prev) => ({
                                   ...prev,
@@ -647,9 +631,20 @@ export default function AddShipment() {
                           <thead className="bg-base-200/50">
                             <tr>
                               <th>S.No</th>
-                              <th className="w-[40%]">Item Details</th>
-                              <th className="whitespace-nowrap">Quantity</th>
-                              <th>Rate (₹)</th>
+                              <th className="w-[40%]">
+                                Item Details
+                                <span className="text-red-500 ml-1">
+                                  *
+                                </span>{" "}
+                              </th>
+                              <th className="whitespace-nowrap">
+                                Quantity
+                                <span className="text-red-500 ml-1">*</span>
+                              </th>
+                              <th>
+                                Rate (₹)
+                                <span className="text-red-500 ml-1">*</span>
+                              </th>
                               <th>Subtotal (₹)</th>
                               <th></th>
                             </tr>
@@ -676,6 +671,8 @@ export default function AddShipment() {
                                   <td>
                                     <Select
                                       unstyled
+                                      required
+                                      isClearable
                                       isSearchable
                                       placeholder="- Search item..."
                                       options={itemOptions}
@@ -698,11 +695,11 @@ export default function AddShipment() {
                                       menuPlacement="auto"
                                       classNames={{
                                         control: ({ isFocused }) =>
-                                          `select select-bordered w-full rounded-2xl
-                     bg-base-100/50 border-base-300
-                     transition-all duration-300
-                     ${isFocused ? "border-primary ring-4 ring-primary/20" : ""}`,
-
+                                          `input input-bordered w-full outline-none rounded-2xl bg-base-100/50 border-base-300 transition-all duration-300 ${
+                                            isFocused
+                                              ? "border-primary ring-4 ring-primary/20"
+                                              : ""
+                                          }`,
                                         valueContainer: () => "px-3",
                                         input: () => "text-sm",
                                         placeholder: () =>
@@ -711,9 +708,9 @@ export default function AddShipment() {
                                         menu: () =>
                                           "mt-2 rounded-xl border border-base-300 bg-base-100 shadow-lg",
                                         option: ({ isFocused, isSelected }) =>
-                                          `px-3 py-2 cursor-pointer text-sm
-                     ${isFocused ? "bg-base-200" : ""}
-                     ${isSelected ? "bg-primary text-primary-content" : ""}`,
+                                          `px-3 py-2 cursor-pointer text-sm ${
+                                            isFocused ? "bg-base-200" : ""
+                                          } ${isSelected ? "bg-primary text-primary-content" : ""}`,
                                       }}
                                     />
                                   </td>
@@ -723,6 +720,7 @@ export default function AddShipment() {
                                     <input
                                       type="numeric"
                                       min="1"
+                                      required
                                       value={row.quantity}
                                       onChange={(e) =>
                                         updateRow(i, "quantity", e.target.value)
@@ -741,6 +739,7 @@ export default function AddShipment() {
                                       type="numeric"
                                       step="0.01"
                                       min="0"
+                                      required
                                       value={row.itemRate}
                                       onChange={(e) =>
                                         updateRow(i, "itemRate", e.target.value)
@@ -803,17 +802,18 @@ export default function AddShipment() {
                     </div>
 
                     {/* Submit Buttons */}
-                    <div className="flex justify-end gap-4 pt-6">
+                    <div className="flex justify-end gap-4">
                       <button
                         type="submit"
-                        className={`btn btn-primary rounded-2xl px-8 ${isSubmitting ? "loading" : ""}`}
+                        className={`btn btn-primary rounded-2xl px-8 hover:shadow-xl hover:shadow-primary/20 transform hover:-translate-y-0.5 transition-all duration-300 font-medium${isSubmitting ? "loading" : ""}`}
                         disabled={isSubmitting}
                       >
+                        <Ship className="h-6 w-6 text-white-200" />
                         {isSubmitting ? "Submitting..." : "Create Shipment"}
                       </button>
                       <button
                         type="button"
-                        className="btn btn-ghost rounded-2xl px-8"
+                        className="btn btn-ghost border-primary/20 rounded-2xl w-44 px-8 hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 font-medium"
                         disabled={isSubmitting}
                         onClick={() => {
                           setSelectedBusinessId("");

@@ -1,5 +1,5 @@
 "use client";
- 
+
 import Sidebar from "@/app/admin/components/sidebar";
 import { useState, useMemo } from "react";
 import { useGetAllCustomerQuery } from "@/app/admin/services/customerApi";
@@ -11,7 +11,7 @@ type BillingAddress = {
   stateOrProvince: string;
   postalCode: number;
 };
- 
+
 type Customer = {
   id: number;
   businessName: string;
@@ -20,42 +20,40 @@ type Customer = {
   contactPersonName: string;
   billingAddress: BillingAddress;
 };
- 
+
 export default function CustomersPage() {
   const [search, setSearch] = useState("");
   const { data: customers = [], isLoading, isError } = useGetAllCustomerQuery();
- 
+
   // Filter customers based on search
   const filteredCustomers = useMemo(() => {
     const query = search.toLowerCase();
     return customers.filter((customer: Customer) =>
-      customer.businessName.toLowerCase().includes(query)
+      customer.businessName.toLowerCase().includes(query),
     );
   }, [customers, search]);
- 
+
   // Helper to format billing address
   const formatAddress = (address: BillingAddress) => {
     return `${address.addressLine1}${address.addressLine2 ? ", " + address.addressLine2 : ""}, ${address.cityOrDistrict}, ${address.stateOrProvince} - ${address.postalCode}`;
   };
- 
+
   return (
     <div className="drawer lg:drawer-open min-h-screen">
       <Sidebar />
       <div className="drawer-content bg-base-200 p-6">
         {/* Header + Search */}
         {/* Drawer toggle button (mobile only) */}
-                          <label
-              htmlFor="my-drawer"
-              className="btn btn-square btn-ghost lg:hidden"
-            >
-              <Menu className="h-5 w-5" />
-                          </label>
-       
- 
- 
+        <label
+          htmlFor="my-drawer"
+          className="btn btn-square btn-ghost lg:hidden"
+        >
+          <Menu className="h-5 w-5" />
+        </label>
+
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
           <h1 className="text-2xl font-bold">All Customers</h1>
- 
+
           <input
             type="text"
             placeholder="Search customers..."
@@ -64,12 +62,12 @@ export default function CustomersPage() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
- 
+
         {/* Table */}
         <div className="card bg-base-100 shadow rounded-xl">
           <div className="overflow-x-auto p-4">
             <table className="table table-zebra w-full">
-            <thead className="text-black">
+              <thead className="text-black">
                 <tr>
                   <th>Business Name</th>
                   <th>Phone Number</th>
@@ -78,7 +76,7 @@ export default function CustomersPage() {
                   <th>Contact Person</th>
                 </tr>
               </thead>
- 
+
               <tbody>
                 {isLoading ? (
                   <tr>

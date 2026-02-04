@@ -12,47 +12,61 @@ class BusinessController {
         email,
         billingAddress,
       } = req.body;
-      console.log(req.body);
 
-      if (!businessName || !contactPersonName || !phoneNumber || !email || !billingAddress) {
+      if (
+        !businessName ||
+        !contactPersonName ||
+        !phoneNumber ||
+        !email ||
+        !billingAddress
+      ) {
         return res.status(400).json({ error: "All fields are required" });
       }
 
-      const address = await prisma.billingAddress.create({
-        data: {
-          addressLine1: billingAddress.addressLine1,
-          addressLine2: billingAddress.addressLine2,
-          cityOrDistrict: billingAddress.cityOrDistrict,
-          stateOrProvince: billingAddress.stateOrProvince,
-          postalCode: Number(billingAddress.postalCode),
-          tenantId:req.user.id,
-        },
+      const result = await prisma.$transaction(async (tx) => {
+        
+        const address = await tx.billingAddress.create({
+          data: {
+            addressLine1: billingAddress.addressLine1,
+            addressLine2: billingAddress.addressLine2,
+            cityOrDistrict: billingAddress.cityOrDistrict,
+            stateOrProvince: billingAddress.stateOrProvince,
+            postalCode: Number(billingAddress.postalCode),
+            tenantId: req.user.id,
+          },
+        });
+
+        const business = await tx.business.create({
+          data: {
+            businessName,
+            contactPersonName,
+            phoneNumber,
+            email,
+            billingAddressId: address.id,
+            tenantId: req.user.id,
+          },
+        });
+
+        return business;
       });
 
-      const business = await prisma.business.create({
-        data: {
-          businessName,
-          contactPersonName,
-          phoneNumber,
-          email,
-          billingAddressId: address.id,
-          tenantId:req.user.id,
-        },
-      });
-
-      res.status(201).json(business);
+      res.status(201).json(result);
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Failed to create business" });
+      console.error(error.message, "errorsssssssssss");
+      res.status(500).json({ error: error.message });
     }
   };
+
 
   static getAllBusinesses = async (req, res) => {
     try {
       const businesses = await prisma.business.findMany({
         where: {
-        tenantId: req.user.id,   // 👈 Filter by logged-in user
-      },
+          tenantId: req.user.id,
+        },
+        orderBy: {
+          updatedAt: "desc",
+        },
         include: {
           billingAddress: true,
         },
@@ -70,10 +84,10 @@ class BusinessController {
       const { id } = req.params;
 
       const business = await prisma.business.findUnique({
-         where: {
-          id: Number(id) ,
-          tenantId:req.user.id,
-          },
+        where: {
+          id: Number(id),
+          tenantId: req.user.id,
+        },
         include: {
           billingAddress: true,
         },
@@ -101,9 +115,10 @@ class BusinessController {
       } = req.body;
 
       const business = await prisma.business.update({
-        where: { id: Number(id),
-          tenantId:req.user.id,
-         },
+        where: {
+          id: Number(id),
+          tenantId: req.user.id,
+        },
         data: {
           businessName,
           contactPersonName,

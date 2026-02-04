@@ -62,7 +62,7 @@ return (
         {/* Left Gradient Card */}
 
         <div className="hidden relative lg:flex w-2/3 flex-col items-center justify-center p-12 bg-gradient-to-b from-purple-500 to-black rounded-t-3xl grid-lines  ">
-            <h2 className="text-3xl font-bold mb-3">Arun</h2>
+            <h2 className="text-3xl font-bold mb-3">DigiGrain 360</h2>
             <h1 className="text-4xl font-extrabold mb-4">Get Started with Us</h1>
             <p className="text-gray-300 mb-8 text-center">
                 Complete these easy steps to register your account.

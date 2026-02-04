@@ -1,11 +1,14 @@
 import prisma from "../config/prisma.js";
+import emailMiddleware from "../middleware/email.js";
 import TimeRange from "../middleware/timerange.js";
 
 class ShipmentController {
+
+
   static async createShipment(req, res) {
+
     try {
       const { businessId, addressBar, shippingAddress, items } = req.body;
-
       if (!businessId || !Array.isArray(items) || items.length === 0) {
         return res.status(400).json({ error: "Missing required fields" });
       }
@@ -16,6 +19,7 @@ class ShipmentController {
         where: { id: { in: itemIds }, tenantId: req.user.id },
         select: { id: true },
       });
+
 
       if (existingItems.length !== itemIds.length) {
         return res.status(400).json({
@@ -28,6 +32,7 @@ class ShipmentController {
       let finalShippingAddress;
 
       if (addressBar === true) {
+
         const business = await prisma.business.findUnique({
           where: { id: Number(businessId), tenantId: req.user.id },
           include: { billingAddress: true },
@@ -39,13 +44,17 @@ class ShipmentController {
 
         finalShippingAddress = business.billingAddress;
       } else {
+        console.log("📍 Using custom shipping address");
+
         if (!shippingAddress) {
           return res.status(400).json({ error: "Shipping address required" });
         }
 
         finalShippingAddress = shippingAddress;
       }
+
       const result = await prisma.$transaction(async (tx) => {
+
         const address = await tx.shippingAddress.create({
           data: {
             addressLine1: finalShippingAddress.addressLine1,
@@ -57,6 +66,7 @@ class ShipmentController {
           },
         });
 
+
         let totalAmount = 0;
 
         const shipmentItems = items.map((i) => {
@@ -66,14 +76,16 @@ class ShipmentController {
 
           totalAmount += subtotal;
 
+
           return {
             itemId: Number(i.itemId),
             quantity,
             itemRate,
             subtotal,
-            tenantId,
+            tenantId: req.user.id, // ✅ FIXED
           };
         });
+
 
         const shipment = await tx.shipment.create({
           data: {
@@ -83,18 +95,17 @@ class ShipmentController {
             shipmentItems: {
               create: shipmentItems,
             },
-             tenantId: req.user.id,
+            tenantId: req.user.id,
           },
           include: {
             shipmentItems: {
-              include: {
-                item: true,
-              },
+              include: { item: true },
             },
             shippingAddress: true,
-            business: { select: { email: true, contactPersonName: true } }
+            business: { select: { email: true, contactPersonName: true } },
           },
         });
+
 
         try {
           await emailMiddleware.emailSending(
@@ -103,10 +114,10 @@ class ShipmentController {
             shipment.business.contactPersonName,
             shipment.shipmentItems,
           );
+          console.log("✅ Email sent successfully");
         } catch (err) {
-          console.error("Failed to send email:", err);
+          console.error("⚠️ Email sending failed:", err.message);
         }
-
         return shipment;
       });
 
@@ -114,10 +125,13 @@ class ShipmentController {
         message: "Shipment created successfully",
         shipment: result,
       });
+
     } catch (error) {
+      console.error("🔥 Unexpected Error:", error);
       res.status(500).json({ error: "Something went wrong" });
     }
   }
+
 
   static async getShipment(req, res) {
     try {
@@ -264,9 +278,9 @@ class ShipmentController {
   static getAllShipments = async (req, res) => {
     try {
       const shipments = await prisma.shipment.findMany({
-        where:{
-            tenantId: req.user.id,
-          },
+        where: {
+          tenantId: req.user.id,
+        },
         orderBy: {
           updatedAt: "desc",
         },

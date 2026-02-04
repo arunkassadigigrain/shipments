@@ -36,6 +36,7 @@ export const getUserFromToken = (): DecodedUser | null => {
     }
 
     return decoded;
+    console.log("✅ User decoded from token:", decoded);
   } catch (err) {
     console.error("🔥 getUserFromToken: Token decode error!", err);
     localStorage.removeItem("token"); // Optional: remove invalid token

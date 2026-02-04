@@ -1,13 +1,15 @@
 "use client";
-import Sidebar from "@/app/admin/components/sidebar" 
+import Sidebar from "@/app/admin/components/sidebar";
 import { useState } from "react";
 import { Menu, UserPlus, AlertCircle } from "lucide-react";
 import { useCreateCustomerMutation } from "@/app/admin/services/customerApi";
 import { toast } from "react-toastify";
 
 export default function AddCustomer() {
-  
-  const [createCustomer, { isLoading, isError, error }] = useCreateCustomerMutation();
+  const [createCustomer, { isLoading, isError, error }] =
+    useCreateCustomerMutation();
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     businessName: "",
@@ -19,7 +21,7 @@ export default function AddCustomer() {
       addressLine2: "",
       cityOrDistrict: "",
       stateOrProvince: "",
-      postalCode: 0,
+      postalCode: "",
     },
   });
 
@@ -30,22 +32,37 @@ export default function AddCustomer() {
     });
   };
 
-  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setForm({
-      ...form,
+  const handleAddressChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+
+    setForm((prev) => ({
+      ...prev,
       billingAddress: {
-        ...form.billingAddress,
-        [e.target.name]: e.target.value,
+        ...prev.billingAddress,
+        [name]: name === "postalCode" ? value.replace(/\D/g, "") : value,
       },
-    });
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      await createCustomer(form).unwrap();
-      toast.success("Customer created successfully");
+      await createCustomer({
+        ...form,
+        billingAddress: {
+          ...form.billingAddress,
+          postalCode: Number(form.billingAddress.postalCode),
+        },
+      }).unwrap();
+      // toast.success("Customer created successfully");
+
+      setSuccessMessage(
+        `
+        `,
+      );
 
       setForm({
         businessName: "",
@@ -57,12 +74,16 @@ export default function AddCustomer() {
           addressLine2: "",
           cityOrDistrict: "",
           stateOrProvince: "",
-          postalCode: 0,
+          postalCode: "",
         },
       });
     } catch (err: any) {
       console.error(err);
-      toast.error(err?.data?.message || "Failed to create customer");
+      console.log("Error data:", err?.data?.error);
+      // toast.error(err?.data?.error || "Failed to create customer");
+      setErrorMessage(
+        err?.data?.message || "Failed to create driver. Please try again.",
+      );
     }
   };
 
@@ -77,7 +98,7 @@ export default function AddCustomer() {
         addressLine2: "",
         cityOrDistrict: "",
         stateOrProvince: "",
-        postalCode: 0,
+        postalCode: "",
       },
     });
   };
@@ -97,6 +118,30 @@ export default function AddCustomer() {
             <h1 className="text-lg font-semibold">Add Customer</h1>
           </div>
         </div> */}
+
+        {successMessage && (
+          <div className="fixed inset-0 flex items-center justify-center z-50">
+            <div className="bg-green-100 border border-green-400 text-green-800 p-6 rounded-2xl shadow-lg max-w-sm w-full flex flex-col items-center relative z-50">
+              <div className="text-lg font-medium mb-2">
+                ✅ Customer Created Successfully!
+              </div>
+
+              <div className="text-sm mb-4 text-center">{successMessage}</div>
+
+              <button
+                className="bg-green-200 hover:bg-green-300 text-green-800 font-bold px-4 py-2 rounded-lg"
+                onClick={() => setSuccessMessage(null)}
+              >
+                Close
+              </button>
+            </div>
+
+            <div
+              className="absolute inset-0 bg-black/30"
+              onClick={() => setSuccessMessage(null)}
+            ></div>
+          </div>
+        )}
 
         {/* Main Content */}
         <div className="flex-1 px-4 py-4 md:px-6 lg:px-8 overflow-y-auto">
@@ -180,7 +225,9 @@ export default function AddCustomer() {
                       <div className="alert alert-error shadow-lg rounded-2xl">
                         <AlertCircle className="w-6 h-6" />
                         <span>
-                          {error && "data" in error && (error.data as any)?.message
+                          {error &&
+                          "data" in error &&
+                          (error.data as any)?.message
                             ? (error.data as any).message
                             : "Failed to create customer. Please check the details."}
                         </span>
@@ -198,7 +245,8 @@ export default function AddCustomer() {
                         <div className="form-control">
                           <label className="label py-1">
                             <span className="label-text font-medium text-sm">
-                              Business Name<span className="text-red-500 ml-1">*</span>
+                              Business Name
+                              <span className="text-red-500 ml-1">*</span>
                             </span>
                           </label>
                           <input
@@ -206,7 +254,7 @@ export default function AddCustomer() {
                             name="businessName"
                             value={form.businessName}
                             onChange={handleChange}
-                            placeholder="e.g. Digi Grain"
+                            // placeholder="e.g. Digi Grain"
                             disabled={isLoading}
                             className="input input-bordered w-full rounded-2xl bg-base-100/50 border-base-300 focus:border-primary focus:ring-4 outline-none focus:ring-primary/20 transition-all duration-300"
                             required
@@ -216,7 +264,8 @@ export default function AddCustomer() {
                         <div className="form-control">
                           <label className="label py-1">
                             <span className="label-text font-medium text-sm">
-                              Contact Person<span className="text-red-500 ml-1">*</span>
+                              Contact Person
+                              <span className="text-red-500 ml-1">*</span>
                             </span>
                           </label>
                           <input
@@ -224,7 +273,7 @@ export default function AddCustomer() {
                             name="contactPersonName"
                             value={form.contactPersonName}
                             onChange={handleChange}
-                            placeholder="e.g. Praven Gade"
+                            // placeholder="e.g. Praven Gade"
                             disabled={isLoading}
                             className="input input-bordered w-full rounded-2xl bg-base-100/50 border-base-300 focus:border-primary outline-none focus:ring-4 focus:ring-primary/20 transition-all duration-300"
                             required
@@ -234,15 +283,27 @@ export default function AddCustomer() {
                         <div className="form-control">
                           <label className="label py-1">
                             <span className="label-text font-medium text-sm">
-                              Phone Number<span className="text-red-500 ml-1">*</span>
+                              Phone Number
+                              <span className="text-red-500 ml-1">*</span>
                             </span>
                           </label>
                           <input
                             type="tel"
                             name="phoneNumber"
+                            inputMode="numeric"
+                            maxLength={10}
                             value={form.phoneNumber}
-                            onChange={handleChange}
-                            placeholder="e.g. +91 9392382434"
+                            onChange={(e) => {
+                              const value = e.target.value.replace(/\D/g, ""); // digits only
+                              setForm({ ...form, phoneNumber: value });
+                              e.currentTarget.setCustomValidity("");
+                            }}
+                            pattern="[0-9]{10}"
+                            onInvalid={(e) =>
+                              e.currentTarget.setCustomValidity(
+                                "Please enter a valid 10-digit phone number (e.g. 8555886124)",
+                              )
+                            }
                             disabled={isLoading}
                             className="input input-bordered w-full rounded-2xl bg-base-100/50 border-base-300 focus:border-primary outline-none focus:ring-4 focus:ring-primary/20 transition-all duration-300"
                             required
@@ -252,7 +313,8 @@ export default function AddCustomer() {
                         <div className="form-control">
                           <label className="label py-1">
                             <span className="label-text font-medium text-sm">
-                              Email Address<span className="text-red-500 ml-1">*</span>
+                              Email Address
+                              <span className="text-red-500 ml-1">*</span>
                             </span>
                           </label>
                           <input
@@ -260,7 +322,7 @@ export default function AddCustomer() {
                             name="email"
                             value={form.email}
                             onChange={handleChange}
-                            placeholder="e.g. praveen@digigrain.in"
+                            // placeholder="e.g. praveen@digigrain.in"
                             disabled={isLoading}
                             className="input input-bordered w-full rounded-2xl bg-base-100/50 border-base-300 focus:border-primary outline-none focus:ring-4 focus:ring-primary/20 transition-all duration-300"
                             required
@@ -272,34 +334,53 @@ export default function AddCustomer() {
                     {/* ===== Billing Address ===== */}
                     <div>
                       <h2 className="text-lg font-semibold text-base-content/90 mb-6 flex items-center gap-2">
-                        <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <svg
+                          className="w-5 h-5 text-primary"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
                         </svg>
                         Billing Address
                       </h2>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="form-control md:col-span-2">
+                        <div className="form-control">
                           <label className="label py-1">
                             <span className="label-text font-medium text-sm">
-                              Address Line 1<span className="text-red-500 ml-1 mr-2">*</span>
+                              Address Line 1
+                              <span className="text-red-500 ml-1 mr-2">*</span>
                             </span>
                           </label>
-                          <textarea
+                          <input
+                            type="text"
                             name="addressLine1"
                             value={form.billingAddress.addressLine1}
                             onChange={handleAddressChange}
                             disabled={isLoading}
-                            className="textarea textarea-bordered min-h-[100px] outline-none resize-none rounded-2xl bg-base-100/50 border-base-300 focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-300"
-                            placeholder="Street, Building, Area"
+                            className="input input-bordered w-full rounded-2xl outline-none bg-base-100/50 border-base-300 focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-300"
+                            // placeholder="Street, Building, Area"
                             required
                           />
                         </div>
 
                         <div className="form-control">
                           <label className="label py-1">
-                            <span className="label-text font-medium text-sm">Address Line 2</span>
+                            <span className="label-text font-medium text-sm">
+                              Address Line 2
+                            </span>
                           </label>
                           <input
                             type="text"
@@ -307,7 +388,7 @@ export default function AddCustomer() {
                             value={form.billingAddress.addressLine2}
                             onChange={handleAddressChange}
                             disabled={isLoading}
-                            placeholder="Landmark, Floor (optional)"
+                            // placeholder="Landmark, Floor (optional)"
                             className="input input-bordered w-full rounded-2xl outline-none bg-base-100/50 border-base-300 focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-300"
                           />
                         </div>
@@ -315,7 +396,8 @@ export default function AddCustomer() {
                         <div className="form-control">
                           <label className="label py-1">
                             <span className="label-text font-medium text-sm">
-                              City / District<span className="text-red-500 ml-1">*</span>
+                              City / District
+                              <span className="text-red-500 ml-1">*</span>
                             </span>
                           </label>
                           <input
@@ -324,7 +406,7 @@ export default function AddCustomer() {
                             value={form.billingAddress.cityOrDistrict}
                             onChange={handleAddressChange}
                             disabled={isLoading}
-                            placeholder="e.g. Hyderabad"
+                            // placeholder="e.g. Hyderabad"
                             className="input input-bordered w-full rounded-2xl outline-none bg-base-100/50 border-base-300 focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-300"
                             required
                           />
@@ -333,7 +415,8 @@ export default function AddCustomer() {
                         <div className="form-control">
                           <label className="label py-1">
                             <span className="label-text font-medium text-sm">
-                              State / Province<span className="text-red-500 ml-1">*</span>
+                              State / Province
+                              <span className="text-red-500 ml-1">*</span>
                             </span>
                           </label>
                           <input
@@ -342,7 +425,7 @@ export default function AddCustomer() {
                             value={form.billingAddress.stateOrProvince}
                             onChange={handleAddressChange}
                             disabled={isLoading}
-                            placeholder="e.g. Telangana"
+                            // placeholder="e.g. Telangana"
                             className="input input-bordered w-full rounded-2xl outline-none bg-base-100/50 border-base-300 focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-300"
                             required
                           />
@@ -351,16 +434,23 @@ export default function AddCustomer() {
                         <div className="form-control">
                           <label className="label py-1">
                             <span className="label-text font-medium text-sm">
-                              Postal Code<span className="text-red-500 ml-1">*</span>
+                              Postal Code
+                              <span className="text-red-500 ml-1">*</span>
                             </span>
                           </label>
                           <input
-                            type="numeric"
+                            type="number"
                             name="postalCode"
                             value={form.billingAddress.postalCode}
+                            onWheel={(e) => e.currentTarget.blur()}
                             onChange={handleAddressChange}
                             disabled={isLoading}
-                            placeholder="e.g. 500001"
+                            onInvalid={(e) =>
+                              e.currentTarget.setCustomValidity(
+                                "Please enter a valid 5-digit postal code (e.g. 500086)",
+                              )
+                            }
+                            // placeholder="e.g. 500001"
                             className="input input-bordered w-full rounded-2xl outline-none bg-base-100/50 border-base-300 focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-300"
                             required
                           />

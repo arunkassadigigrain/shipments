@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { Menu, Package, AlertCircle } from "lucide-react";
 import { useCreateItemMutation } from "@/app/admin/services/itemApi";
-import { toast } from "react-toastify";
 import Sidebar from "@/app/admin/components/sidebar";
 
 export default function AddItem() {
   const [createItem, { isLoading, isError, error }] = useCreateItemMutation();
-
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [form, setForm] = useState({
     itemName: "",
     itemVariety: "",
@@ -26,13 +26,16 @@ export default function AddItem() {
     e.preventDefault();
 
     try {
-      await createItem({
+      const response = await createItem({
         itemName: form.itemName,
         itemVariety: form.itemVariety,
         packingType: form.packingType,
       }).unwrap();
 
-      toast.success("Item created successfully");
+      // ✅ FIX: SET NON-EMPTY STRING
+      setSuccessMessage(
+        `Item "${response.itemName}" created successfully (ID: ${response.id})`,
+      );
 
       setForm({
         itemName: "",
@@ -40,8 +43,11 @@ export default function AddItem() {
         packingType: "",
       });
     } catch (err: any) {
-      console.error("Create item failed:", err);
-      toast.error(err?.data?.message || "Failed to create item. Please try again.");
+      // ❌ FAILED MODAL
+      setErrorMessage(
+        err?.data?.message || "Failed to create item. Please try again.",
+      );
+      setSuccessMessage(null);
     }
   };
 
@@ -64,6 +70,30 @@ export default function AddItem() {
             <h1 className="text-lg font-semibold">Add Item</h1>
           </div>
         </div> */}
+
+        {successMessage && (
+          <div className="fixed inset-0 flex items-center justify-center z-50">
+            <div className="bg-green-100 border border-green-400 text-green-800 p-6 rounded-2xl shadow-lg max-w-sm w-full flex flex-col items-center relative z-50">
+              <div className="text-lg font-medium mb-2">
+                ✅ Item Created Successfully
+              </div>
+
+              <div className="text-sm mb-4 text-center">{successMessage}</div>
+
+              <button
+                className="bg-green-200 hover:bg-green-300 text-green-800 font-bold px-4 py-2 rounded-lg"
+                onClick={() => setSuccessMessage(null)}
+              >
+                Close
+              </button>
+            </div>
+
+            <div
+              className="absolute inset-0 bg-black/30"
+              onClick={() => setSuccessMessage(null)}
+            ></div>
+          </div>
+        )}
 
         {/* Main Content */}
         <div className="flex-1 px-4 py-4 md:px-6 lg:px-8 overflow-y-auto">
@@ -121,7 +151,9 @@ export default function AddItem() {
                       <div className="alert alert-error shadow-lg rounded-2xl">
                         <AlertCircle className="w-6 h-6" />
                         <span>
-                          {error && "data" in error && (error.data as any)?.message
+                          {error &&
+                          "data" in error &&
+                          (error.data as any)?.message
                             ? (error.data as any).message
                             : "Failed to create item. Please check your input and try again."}
                         </span>
@@ -140,7 +172,7 @@ export default function AddItem() {
                         <input
                           type="text"
                           name="itemName"
-                          placeholder="Basmati Rice"
+                          // placeholder="eg. Basmati Rice"
                           value={form.itemName}
                           onChange={handleChange}
                           className="input input-bordered w-full rounded-2xl bg-base-100/50 border-base-300 focus:border-primary focus:ring-4 focus:ring-primary/20 outline-none transition-all duration-300"
@@ -159,7 +191,7 @@ export default function AddItem() {
                         <input
                           type="text"
                           name="itemVariety"
-                          placeholder="1121, Pusa"
+                          // placeholder="1121, Pusa"
                           value={form.itemVariety}
                           onChange={handleChange}
                           className="input input-bordered w-full rounded-2xl outline-none bg-base-100/50 border-base-300 focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-300"
@@ -167,26 +199,24 @@ export default function AddItem() {
                           disabled={isLoading}
                         />
                       </div>
-                    </div>
-
-                    {/* Packing Type */}
-                    <div className="form-control">
-                      <label className="label py-1">
-                        <span className="label-text font-medium text-sm">
-                          Packing Type
-                          <span className="text-red-500 ml-1">*</span>
-                        </span>
-                      </label>
-                      <input
-                        type="text"
-                        name="packingType"
-                        placeholder="PP Bag, Jute Bag"
-                        value={form.packingType}
-                        onChange={handleChange}
-                        className="input input-bordered w-full rounded-2xl outline-none bg-base-100/50 border-base-300 focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-300"
-                        required
-                        disabled={isLoading}
-                      />
+                      <div className="form-control">
+                        <label className="label py-1">
+                          <span className="label-text font-medium text-sm">
+                            Packing Type
+                            <span className="text-red-500 ml-1">*</span>
+                          </span>
+                        </label>
+                        <input
+                          type="text"
+                          name="packingType"
+                          // placeholder="PP Bag, Jute Bag"
+                          value={form.packingType}
+                          onChange={handleChange}
+                          className="input input-bordered w-full rounded-2xl outline-none bg-base-100/50 border-base-300 focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-300"
+                          required
+                          disabled={isLoading}
+                        />
+                      </div>
                     </div>
 
                     {/* Buttons */}

@@ -23,7 +23,7 @@ export default function Home() {
           router.replace("/auth/login"); // fallback
       }
     } else {
-      router.replace("/");
+      router.replace("/auth/login");
     }
   }, [router, userRole]);
   return (

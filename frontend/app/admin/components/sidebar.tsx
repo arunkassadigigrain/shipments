@@ -1,4 +1,3 @@
-
 "use client";
 import Link from "next/link";
 import Image from "next/image";
@@ -14,6 +13,7 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
+  Database,
 } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import { useState, useEffect } from "react";
@@ -29,8 +29,8 @@ export default function Sidebar() {
     };
 
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   const toggleCollapse = () => setCollapsed(!collapsed);
@@ -65,7 +65,7 @@ export default function Sidebar() {
         type="checkbox"
         className="drawer-toggle"
         checked={isMobileOpen}
-        onChange={() => { }}
+        onChange={() => {}}
       />
 
       <div className="drawer-side z-50 hide-scrollbar">
@@ -89,7 +89,11 @@ export default function Sidebar() {
           {isMobile && (
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-4">
-                <Link href="/" onClick={closeMobileMenu} className="flex items-center gap-4 group">
+                <Link
+                  href="/"
+                  onClick={closeMobileMenu}
+                  className="flex items-center gap-4 group"
+                >
                   <div className="flex-shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:shadow-xl group-hover:shadow-primary/10">
                     <Image
                       src="/digigrainLogo.png"
@@ -112,7 +116,9 @@ export default function Sidebar() {
 
           {/* Collapse Button - Always visible on desktop, hidden on mobile */}
           {!isMobile && (
-            <div className={`${collapsed ? "mt-4" : "mb-4"} flex justify-center`}>
+            <div
+              className={`${collapsed ? "mt-4" : "mb-4"} flex justify-center`}
+            >
               <button
                 onClick={toggleCollapse}
                 title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
@@ -136,14 +142,16 @@ export default function Sidebar() {
             </div>
           )}
 
-
           {/* Content - Only shown when NOT collapsed on desktop, always shown on mobile */}
           {(isMobile || !collapsed) && (
             <>
               {/* Logo & Title - Only on desktop when not collapsed */}
               {!isMobile && !collapsed && (
                 <div className="hidden lg:flex items-center gap-4 px-2 mb-8">
-                  <Link href="/" className="flex items-center justify-center w-full group">
+                  <Link
+                    href="/"
+                    className="flex items-center justify-center w-full group"
+                  >
                     <div className="flex-shrink-0 transition-all duration-300 group-hover:scale-110">
                       <Image
                         src="/digigrainLogo.png"
@@ -243,129 +251,132 @@ export default function Sidebar() {
                     </details>
                   </li>
 
+                  {/* MASTER DROPDOWN */}
                   <li>
                     <details>
-                      <summary
-                        onClick={isMobile ? closeMobileMenu : undefined}
-                        className="hover:bg-base-300/70 rounded-xl px-4 py-3 transition-all duration-300 hover:shadow-md flex items-center gap-3 font-semibold"
-                      >
-                        <ShoppingBag className="h-6 w-6 text-primary" />
-                        <span>Item Master</span>
+                      <summary className="hover:bg-base-300/70 rounded-xl px-4 py-3 transition-all duration-300 hover:shadow-md flex items-center gap-3 font-semibold">
+                        <Database className="h-6 w-6 text-primary" />
+                        <span>Masters</span>
                       </summary>
-                      <ul className="ml-6 mt-2 space-y-1">
+                      <ul className="ml-4 mt-2 space-y-1">
+                        {/* Item Master */}
                         <li>
-                          <Link
-                            href="/admin/Items/add-Item"
-                            onClick={closeMobileMenu}
-                            className="block py-2.5 px-5 rounded-xl hover:bg-primary/10 hover:text-primary transition-all duration-300 hover:translate-x-2 font-medium"
-                          >
-                            Add Item
-                          </Link>
+                          <details>
+                            <summary className="hover:bg-base-300/70 rounded-xl px-4 py-3 transition-all duration-300 hover:shadow-md flex items-center gap-3 font-semibold">
+                              <ShoppingBag className="h-6 w-6 text-primary" />
+                              <span>Item Master</span>
+                            </summary>
+                            <ul className="ml-6 mt-2 space-y-1">
+                              <li>
+                                <Link
+                                  href="/admin/Items/add-Item"
+                                  onClick={closeMobileMenu}
+                                  className="block py-2.5 px-5 rounded-xl hover:bg-primary/10 hover:text-primary transition-all duration-300 hover:translate-x-2 font-medium"
+                                >
+                                  Add Item
+                                </Link>
+                              </li>
+                              <li>
+                                <Link
+                                  href="/admin/Items"
+                                  onClick={closeMobileMenu}
+                                  className="block py-2.5 px-5 rounded-xl hover:bg-primary/10 hover:text-primary transition-all duration-300 hover:translate-x-2 font-medium"
+                                >
+                                  All Items
+                                </Link>
+                              </li>
+                            </ul>
+                          </details>
                         </li>
-                        <li>
-                          <Link
-                            href="/admin/Items"
-                            onClick={closeMobileMenu}
-                            className="block py-2.5 px-5 rounded-xl hover:bg-primary/10 hover:text-primary transition-all duration-300 hover:translate-x-2 font-medium"
-                          >
-                            All Items
-                          </Link>
-                        </li>
-                      </ul>
-                    </details>
-                  </li>
 
-                  <li>
-                    <details>
-                      <summary
-                        onClick={isMobile ? closeMobileMenu : undefined}
-                        className="hover:bg-base-300/70 rounded-xl px-4 py-3 transition-all duration-300 hover:shadow-md flex items-center gap-3 font-semibold"
-                      >
-                        <Users className="h-6 w-6 text-primary" />
-                        <span>Customer Master</span>
-                      </summary>
-                      <ul className="ml-6 mt-2 space-y-1">
+                        {/* Customer Master */}
                         <li>
-                          <Link
-                            href="/admin/customers/add-customer"
-                            onClick={closeMobileMenu}
-                            className="block py-2.5 px-5 rounded-xl hover:bg-primary/10 hover:text-primary transition-all duration-300 hover:translate-x-2 font-medium"
-                          >
-                            Add Customer
-                          </Link>
+                          <details>
+                            <summary className="hover:bg-base-300/70 rounded-xl px-4 py-3 transition-all duration-300 hover:shadow-md flex items-center gap-3 font-semibold">
+                              <Users className="h-6 w-6 text-primary" />
+                              <span>Customer Master</span>
+                            </summary>
+                            <ul className="ml-6 mt-2 space-y-1">
+                              <li>
+                                <Link
+                                  href="/admin/customers/add-customer"
+                                  onClick={closeMobileMenu}
+                                  className="block py-2.5 px-5 rounded-xl hover:bg-primary/10 hover:text-primary transition-all duration-300 hover:translate-x-2 font-medium"
+                                >
+                                  Add Customer
+                                </Link>
+                              </li>
+                              <li>
+                                <Link
+                                  href="/admin/customers"
+                                  onClick={closeMobileMenu}
+                                  className="block py-2.5 px-5 rounded-xl hover:bg-primary/10 hover:text-primary transition-all duration-300 hover:translate-x-2 font-medium"
+                                >
+                                  All Customers
+                                </Link>
+                              </li>
+                            </ul>
+                          </details>
                         </li>
-                        <li>
-                          <Link
-                            href="/admin/customers"
-                            onClick={closeMobileMenu}
-                            className="block py-2.5 px-5 rounded-xl hover:bg-primary/10 hover:text-primary transition-all duration-300 hover:translate-x-2 font-medium"
-                          >
-                            All Customers
-                          </Link>
-                        </li>
-                      </ul>
-                    </details>
-                  </li>
+                        {/* Driver Master */}
 
-                  <li>
-                    <details>
-                      <summary
-                        onClick={isMobile ? closeMobileMenu : undefined}
-                        className="hover:bg-base-300/70 rounded-xl px-4 py-3 transition-all duration-300 hover:shadow-md flex items-center gap-3 font-semibold"
-                      >
-                        <Truck className="h-6 w-6 text-primary" />
-                        <span>Truck Master</span>
-                      </summary>
-                      <ul className="ml-6 mt-2 space-y-1">
                         <li>
-                          <Link
-                            href="/admin/trucks/add-trucks"
-                            onClick={closeMobileMenu}
-                            className="block py-2.5 px-5 rounded-xl hover:bg-primary/10 hover:text-primary transition-all duration-300 hover:translate-x-2 font-medium"
-                          >
-                            Add Truck
-                          </Link>
+                          <details>
+                            <summary className="hover:bg-base-300/70 rounded-xl px-4 py-3 transition-all duration-300 hover:shadow-md flex items-center gap-3 font-semibold">
+                              <User className="h-6 w-6 text-primary" />
+                              <span>Driver Master</span>
+                            </summary>
+                            <ul className="ml-6 mt-2 space-y-1">
+                              <li>
+                                <Link
+                                  href="/admin/drivers/add-driver"
+                                  onClick={closeMobileMenu}
+                                  className="block py-2.5 px-5 rounded-xl hover:bg-primary/10 hover:text-primary transition-all duration-300 hover:translate-x-2 font-medium"
+                                >
+                                  Add Driver
+                                </Link>
+                              </li>
+                              <li>
+                                <Link
+                                  href="/admin/drivers"
+                                  onClick={closeMobileMenu}
+                                  className="block py-2.5 px-5 rounded-xl hover:bg-primary/10 hover:text-primary transition-all duration-300 hover:translate-x-2 font-medium"
+                                >
+                                  All Drivers
+                                </Link>
+                              </li>
+                            </ul>
+                          </details>
                         </li>
-                        <li>
-                          <Link
-                            href="/admin/trucks"
-                            onClick={closeMobileMenu}
-                            className="block py-2.5 px-5 rounded-xl hover:bg-primary/10 hover:text-primary transition-all duration-300 hover:translate-x-2 font-medium"
-                          >
-                            All Trucks
-                          </Link>
-                        </li>
-                      </ul>
-                    </details>
-                  </li>
 
-                  <li>
-                    <details>
-                      <summary
-                        onClick={isMobile ? closeMobileMenu : undefined}
-                        className="hover:bg-base-300/70 rounded-xl px-4 py-3 transition-all duration-300 hover:shadow-md flex items-center gap-3 font-semibold"
-                      >
-                        <User className="h-6 w-6 text-primary" />
-                        <span>Driver Master</span>
-                      </summary>
-                      <ul className="ml-6 mt-2 space-y-1">
+                        {/* Truck Master */}
                         <li>
-                          <Link
-                            href="/admin/drivers/add-driver"
-                            onClick={closeMobileMenu}
-                            className="block py-2.5 px-5 rounded-xl hover:bg-primary/10 hover:text-primary transition-all duration-300 hover:translate-x-2 font-medium"
-                          >
-                            Add Driver
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            href="/admin/drivers"
-                            onClick={closeMobileMenu}
-                            className="block py-2.5 px-5 rounded-xl hover:bg-primary/10 hover:text-primary transition-all duration-300 hover:translate-x-2 font-medium"
-                          >
-                            All Drivers
-                          </Link>
+                          <details>
+                            <summary className="hover:bg-base-300/70 rounded-xl px-4 py-3 transition-all duration-300 hover:shadow-md flex items-center gap-3 font-semibold">
+                              <Truck className="h-6 w-6 text-primary" />
+                              <span>Truck Master</span>
+                            </summary>
+                            <ul className="ml-6 mt-2 space-y-1">
+                              <li>
+                                <Link
+                                  href="/admin/trucks/add-trucks"
+                                  onClick={closeMobileMenu}
+                                  className="block py-2.5 px-5 rounded-xl hover:bg-primary/10 hover:text-primary transition-all duration-300 hover:translate-x-2 font-medium"
+                                >
+                                  Add Truck
+                                </Link>
+                              </li>
+                              <li>
+                                <Link
+                                  href="/admin/trucks"
+                                  onClick={closeMobileMenu}
+                                  className="block py-2.5 px-5 rounded-xl hover:bg-primary/10 hover:text-primary transition-all duration-300 hover:translate-x-2 font-medium"
+                                >
+                                  All Trucks
+                                </Link>
+                              </li>
+                            </ul>
+                          </details>
                         </li>
                       </ul>
                     </details>
@@ -395,5 +406,3 @@ export default function Sidebar() {
     </>
   );
 }
-
-

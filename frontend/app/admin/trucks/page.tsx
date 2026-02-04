@@ -6,7 +6,7 @@ import { useGetAllTrucksQuery } from "@/app/admin/services/truckApi";
 import { Menu } from "lucide-react";
 type Truck = {
   id: number;
-  truckCapacity: number;
+  truckCapacity: string;
   truckNumber: string;
   truckModel: string;
   ownerPhoneNumber: string;

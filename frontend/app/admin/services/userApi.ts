@@ -1,77 +1,76 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 // Define a service using a base URL and expected endpoints
 export const authApi = createApi({
-  reducerPath: 'authApi',
-  baseQuery: fetchBaseQuery({ baseUrl: `http://localhost:8000/api/users/`,
+  reducerPath: "authApi",
+  baseQuery: fetchBaseQuery({
+    baseUrl: `http://localhost:8000/api/users/`,
     prepareHeaders: (headers) => {
       // Get token directly when preparing headers
-      const token = localStorage.getItem('token'); 
+      const token = localStorage.getItem("token");
       if (token) {
-        headers.set('Authorization', `Bearer ${token}` );
+        headers.set("Authorization", `Bearer ${token}`);
       }
-      
-      headers.set('Content-Type', 'application/json');
+
+      headers.set("Content-Type", "application/json");
       return headers;
     },
-   }),
+  }),
   endpoints: (builder) => ({
     createUser: builder.mutation({
       query: (user) => {
         // console.log("Create User Data", user);
         return {
-          url: 'register',
-          method: 'POST',
+          url: "register",
+          method: "POST",
           body: user,
           headers: {
-            'Content-type': 'application/json'
-          }
-        }
-      }
+            "Content-type": "application/json",
+          },
+        };
+      },
     }),
     loginUser: builder.mutation({
       query: (user) => {
         return {
           url: `login`,
-          method: 'POST',
+          method: "POST",
           body: user,
           headers: {
-            'Content-type': 'application/json'
+            "Content-type": "application/json",
           },
-          credentials: 'include'  // It is required to set cookie
-        }
-      }
+          credentials: "include", // It is required to set cookie
+        };
+      },
     }),
     logoutUser: builder.mutation({
-  query: () => ({
-    url: `logout`,
-    method: "POST",
-    body: {},
-    headers: {
-      "Content-type": "application/json",
-    },
-    credentials: "include",
+      query: () => ({
+        url: `logout`,
+        method: "POST",
+        body: {},
+        headers: {
+          "Content-type": "application/json",
+        },
+        credentials: "include",
+      }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          // ✅ Clear token on successful logout
+          localStorage.removeItem("token");
+          // If you use refreshToken, clear it too
+          localStorage.removeItem("refreshToken");
+;
+        } catch (err) {
+          console.error("Logout failed:", err);
+        }
+      },
+    }),
   }),
-  async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-    try {
-      await queryFulfilled;
-      // ✅ Clear token on successful logout
-      localStorage.removeItem("token");
-      // If you use refreshToken, clear it too
-      localStorage.removeItem("refreshToken");
+});
 
-      // (Optional) reset user slice if you have one
-      // dispatch(userLoggedOut());
-    } catch (err) {
-      console.error("Logout failed:", err);
-    }
-  },
-}),
-    
-  }),
-})
-
-export const { useCreateUserMutation, 
-               useLoginUserMutation,
-               useLogoutUserMutation  } = authApi
+export const {
+  useCreateUserMutation,
+  useLoginUserMutation,
+  useLogoutUserMutation,
+} = authApi;

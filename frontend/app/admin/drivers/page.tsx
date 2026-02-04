@@ -55,14 +55,14 @@ return Drivers.filter(
         </div>
  
         {/* Table */}
-        <div className="card bg-base-100 shadow rounded-xl">
-          <div className="overflow-x-auto p-4">
-            <table className="table table-zebra w-full">
+        <div className="card bg-base-100 shadow rounded-xl  w-full max-w-4xl  mx-auto ">
+          <div className="overflow-x-auto p-5">
+            <table className="table table-zebra table-m w-full  ">
               <thead className="text-black">
                 <tr>
                   <th>DriverName</th>
-                  <th>Driverphonenumber</th>
-                   <th>Alternate Phone</th>
+                  <th>PhoneNumber</th>
+                   <th>AlternatePhone</th>
                 </tr>
               </thead>
  
@@ -84,7 +84,7 @@ return Drivers.filter(
                     <tr key={item.id}>
                       <td>{item.Drivername}</td>
                       <td>{item.phoneNumber}</td>
-                      <td>{item.alternatePhoneNumber}</td>
+                      <td>{item.alternatePhoneNumber || "-"} </td>
                  </tr>
                   ))
                 )}

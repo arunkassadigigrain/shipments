@@ -62,7 +62,7 @@ model Driver {
   truckId              Int?
   truck                Truck?   @relation("TruckDrivers", fields: [truckId], references: [id])
 
-  defaultForTruck      Truck?   @relation("DefaultDriver")
+  defaultForTruck      Truck[]   @relation("DefaultDriver")
 
   trips                Trip[]
 
@@ -74,12 +74,12 @@ model Truck {
   id                   Int      @id @default(autoincrement())
   tenantId        Int
   truckNumber          String
-  truckCapacity        Int
+  truckCapacity        String
   truckModel           String
   ownerPhoneNumber     String
   alternatePhoneNumber String?
 
-  defaultDriverId      Int?     @unique
+  defaultDriverId      Int?
   defaultDriver        Driver?  @relation("DefaultDriver", fields: [defaultDriverId], references: [id])
 
   drivers              Driver[] @relation("TruckDrivers")

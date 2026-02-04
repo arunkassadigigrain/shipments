@@ -78,7 +78,7 @@ CREATE TABLE "Truck" (
     "id" SERIAL NOT NULL,
     "tenantId" INTEGER NOT NULL,
     "truckNumber" TEXT NOT NULL,
-    "truckCapacity" INTEGER NOT NULL,
+    "truckCapacity" TEXT NOT NULL,
     "truckModel" TEXT NOT NULL,
     "ownerPhoneNumber" TEXT NOT NULL,
     "alternatePhoneNumber" TEXT,
@@ -172,9 +172,6 @@ CREATE TABLE "User" (
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
-
--- CreateIndex
-CREATE UNIQUE INDEX "Truck_defaultDriverId_key" ON "Truck"("defaultDriverId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "ShipmentOTP_tripId_shipmentId_key" ON "ShipmentOTP"("tripId", "shipmentId");

@@ -38,10 +38,11 @@ class TripController {
           },
         });
 
+        console.log(`✅ Trip created with ID: ${trip.id}`);
         // 2️⃣ Update Shipments
         await tx.shipment.updateMany({
           where: {
-            id: { in: shipmentIds.map(Number),  tenantId: req.user.id, },
+            id: { in: shipmentIds.map(Number) },
           },
           data: { Status: "ONTHEWAY" },
         });
@@ -74,7 +75,7 @@ class TripController {
         // 5️⃣ Fetch business details
         const shipmentsWithBusiness = await tx.shipment.findMany({
           where: {
-            id: { in: shipmentIds.map(Number), tenantId: req.user.id },
+            id: { in: shipmentIds.map(Number)},
           },
           select: {
             id: true,

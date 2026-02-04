@@ -1,58 +1,77 @@
 "use client";
- 
+
 import { useMemo, useState } from "react";
-import { Menu } from "lucide-react";
+import { Menu  } from "lucide-react";
 import Sidebar from "@/app/admin/components/sidebar";
 import { useGetAllShipmentsQuery } from "@/app/admin/services/shipmentApi";
-import type { Shipment } from "@/app/admin/services/shipmentApi";
- 
+
 /* ===================== STATUS BADGE ===================== */
-// const StatusBadge = ({ status }: { status: Shipment["status"] }) => {
-//   const styles = {
-//     CREATED: "badge badge-info",
-//     ONTHEWAY: "badge badge-warning",
-//     COMPLETED: "badge badge-success",
-//   };
+type ShipmentStatus = "CREATED" | "ONTHEWAY" | "COMPLETED";
+
+const StatusBadge = ({ status }: { status: ShipmentStatus }) => {
+  const meta: Record<
+    ShipmentStatus,
+    {
+      label: string;
+      className: string;
+   
+    }
+  > = {
+    CREATED: {
+      label: "CREATED",
+      className: "badge badge-info gap-2",
+     
+    },
+    ONTHEWAY: {
+      label: "ON THE WAY",
+      className: "badge badge-warning gap-2",
+     
+    },
+    COMPLETED: {
+      label: "COMPLETED",
+      className: "badge badge-success gap-2",
+   
+    },
+  };
+
  
-//   const labels = {
-//     CREATED: "Shipment Created",
-//     ONTHEWAY: "Shipment On the Way",
-//     COMPLETED: "Completed",
-//   };
- 
-//   return <span className={styles[status]}>{labels[status]}</span>;
-// };
- 
+
+  return (
+    <span className={meta[status].className}>
+     
+      {meta[status].label}
+    </span>
+  );
+};
+
 export default function ShipmentPage() {
   const [search, setSearch] = useState("");
- 
+
   const {
     data: shipments = [],
     isLoading,
     isError,
   } = useGetAllShipmentsQuery();
- 
+
   /* ===================== SEARCH FILTER ===================== */
   const filteredShipments = useMemo(() => {
     const q = search.toLowerCase();
- 
-    return shipments.filter((s) =>
+
+    return shipments.filter((s: any) =>
       s.id.toString().includes(q) ||
       s.business.businessName.toLowerCase().includes(q) ||
       s.business.phoneNumber.includes(q) ||
       s.shippingAddress.addressLine1.toLowerCase().includes(q) ||
-   
       s.shippingAddress.cityOrDistrict.toLowerCase().includes(q) ||
-      s.shippingAddress.stateOrProvince.toLowerCase().includes(q)  
-     
+      s.shippingAddress.stateOrProvince.toLowerCase().includes(q)
     );
   }, [shipments, search]);
- 
+
   return (
     <div className="drawer lg:drawer-open min-h-screen">
       {/* Sidebar */}
       <Sidebar />
- 
+
       <div className="drawer-content bg-base-200 p-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
@@ -62,9 +81,9 @@ export default function ShipmentPage() {
           >
             <Menu className="h-5 w-5" />
           </label>
- 
+
           <h1 className="text-2xl font-bold">Shipments</h1>
- 
+
           <input
             type="text"
             placeholder="Search shipment..."
@@ -73,7 +92,7 @@ export default function ShipmentPage() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
- 
+
         {/* Table */}
         <div className="card bg-base-100 shadow rounded-xl">
           <div className="overflow-x-auto p-4">
@@ -82,34 +101,34 @@ export default function ShipmentPage() {
                 <tr>
                   <th>Shipment Date</th>
                   <th>Shipment ID</th>
-                  {/* <th>Status</th> */}
                   <th>Business Name</th>
                   <th>Phone Number</th>
                   <th>Shipping Address</th>
+                  <th>Status</th>
                 </tr>
               </thead>
- 
+
               <tbody>
                 {isLoading ? (
                   <tr>
-                    <td colSpan={5} className="text-center">
+                    <td colSpan={6} className="text-center">
                       Loading...
                     </td>
                   </tr>
                 ) : isError ? (
                   <tr>
-                    <td colSpan={5} className="text-center text-red-500">
+                    <td colSpan={6} className="text-center text-red-500">
                       Failed to load shipments
                     </td>
                   </tr>
                 ) : filteredShipments.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="text-center text-gray-400">
+                    <td colSpan={6} className="text-center text-gray-400">
                       No shipments found
                     </td>
                   </tr>
                 ) : (
-                  filteredShipments.map((s) => (
+                  filteredShipments.map((s: any) => (
                     <tr key={s.id}>
                       <td>
                         {new Date(s.shipmentDate).toLocaleDateString("en-GB", {
@@ -118,17 +137,13 @@ export default function ShipmentPage() {
                           year: "numeric",
                         })}
                       </td>
- 
+
                       <td>{String(s.id).padStart(4, "0")}</td>
- 
-                      {/* <td>
-                        <StatusBadge status={s.status} />
-                      </td> */}
- 
+
                       <td>{s.business.businessName}</td>
- 
+
                       <td>{s.business.phoneNumber}</td>
- 
+
                       <td className="max-w-md whitespace-normal">
                         {s.shippingAddress.addressLine1}
                         {s.shippingAddress.addressLine2 && (
@@ -138,6 +153,11 @@ export default function ShipmentPage() {
                         {s.shippingAddress.cityOrDistrict},{" "}
                         {s.shippingAddress.stateOrProvince} -{" "}
                         {s.shippingAddress.postalCode}
+                      </td>
+
+                      {/* ✅ STATUS WORKS HERE */}
+                      <td>
+                        <StatusBadge status={s.Status} />
                       </td>
                     </tr>
                   ))
@@ -150,4 +170,4 @@ export default function ShipmentPage() {
     </div>
   );
 }
- 
+

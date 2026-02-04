@@ -36,3 +36,23 @@ export const changePasswordSchema = Yup.object({
     .required("Confirm password is required")
     .oneOf([Yup.ref("password") as unknown as string, "Password and Confirm Password doesn't match"]),
 });
+
+
+export const itemSchema = Yup.object({
+  itemName: Yup.string()
+    .required("Item Name is required")
+    .min(2, "Item Name must be at least 2 characters")
+    .max(50, "Item Name cannot exceed 50 characters"),
+
+  itemVariety: Yup.string()
+    .required("Item Variety is required")
+    .min(2, "Item Variety must be at least 2 characters")
+    .max(50, "Item Variety cannot exceed 50 characters"),
+
+  packingType: Yup.string()
+    .required("Packing Type is required")
+    .min(2, "Packing Type must be at least 2 characters")
+    .max(50, "Packing Type cannot exceed 50 characters"),
+});
+
+

@@ -11,6 +11,9 @@ class DriverController {
                 where: {
                     tenantId: req.user.id,
                  },
+                 orderBy:{
+                    updatedAt:'desc'
+                 },
                 include: {
                     truck: true,
                 },

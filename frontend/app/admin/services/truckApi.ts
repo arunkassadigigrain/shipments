@@ -4,7 +4,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 interface Truck {
   id: number
   truckNumber: string
-  truckCapacity: number
+  truckCapacity: string
   truckModel: string
   ownerPhoneNumber: string
   alternatePhoneNumber?: string
