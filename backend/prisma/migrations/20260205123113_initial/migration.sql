@@ -138,6 +138,7 @@ CREATE TABLE "ShipmentOTP" (
     "tenantId" INTEGER NOT NULL,
     "tripId" INTEGER NOT NULL,
     "shipmentId" INTEGER NOT NULL,
+    "link" TEXT NOT NULL,
     "otpCode" INTEGER NOT NULL,
     "isVerified" BOOLEAN NOT NULL DEFAULT false,
     "expiresAt" TIMESTAMP(3) NOT NULL,

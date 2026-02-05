@@ -313,7 +313,11 @@ class ShipmentController {
         },
         include: {
           business: true,
-          shipmentItems: true,
+          shipmentItems: {
+            include: {
+              item: true,
+            },
+          },
           shippingAddress: true,
         },
       });

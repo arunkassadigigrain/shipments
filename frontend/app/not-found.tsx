@@ -1,28 +1,41 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 
 export default function NotFound() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-black text-white px-4">
-      {/* GIF */}
-      {/* <img
-        src="/404.gif"
-        alt="Page not found"
-        className="w-80 max-w-full mb-6"
-      /> */}
+    <div className="min-h-screen flex flex-col items-center justify-center bg-white text-white px-4 text-center">
 
-      <h1 className="text-3xl font-bold mb-2">Page Not Found</h1>
-      <p className="text-gray-400 mb-6 text-center">
-        Oops! The page you’re looking for doesn’t exist.
+      {/* 3D Delivery Box Image */}
+      <Image
+        src="/3d_delivery.jpg"
+        alt="404 delivery box"
+        width={260}
+        height={260}
+        className="mb-6 w-48 sm:w-64"
+        priority
+      />
+
+      <p className="text-orange-500 text-lg font-semibold mb-2">
+        Oops...
+      </p>
+
+      <h1 className="text-3xl text-orange-500  sm:text-4xl font-bold mb-2">
+        Error 404
+      </h1>
+
+      <p className="text-gray-400 mb-6 max-w-xs sm:max-w-md">
+        The page you requested could not be found.
       </p>
 
       <Link
-        href="/"
-        className="px-6 py-3 rounded-lg bg-white text-black font-medium hover:bg-gray-200 transition"
+        href="/auth/login"
+        className="px-6 py-3 rounded-full bg-orange-500 text-white font-medium hover:bg-orange-600 transition"
       >
-        Go back home
+        Back to home
       </Link>
     </div>
   );
 }
+

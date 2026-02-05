@@ -145,6 +145,7 @@ model ShipmentOTP {
 
   shipmentId  Int
   shipment    Shipment @relation(fields: [shipmentId], references: [id])
+  link        String
 
   otpCode     Int
   isVerified  Boolean  @default(false)

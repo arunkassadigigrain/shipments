@@ -52,7 +52,7 @@ class TripController {
           data: shipmentIds.map((id) => ({
             tripId: trip.id,
             shipmentId: Number(id),
-             tenantId: req.user.id,
+            tenantId: req.user.id,
           })),
         });
 
@@ -61,12 +61,16 @@ class TripController {
           otpCode: Math.floor(100000 + Math.random() * 900000),
         }));
 
+        const link = GenerateLink.generateTrackLink(trip.id);
+        console.log(`🔗 Generated tracking link: ${link}`);
+
         await tx.shipmentOTP.createMany({
           data: otpMap.map((item) => ({
             tripId: trip.id,
             shipmentId: item.shipmentId,
             otpCode: item.otpCode,
-             tenantId: req.user.id,
+            tenantId: req.user.id,
+            link: link,
             expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
           })),
         });
@@ -75,7 +79,7 @@ class TripController {
         // 5️⃣ Fetch business details
         const shipmentsWithBusiness = await tx.shipment.findMany({
           where: {
-            id: { in: shipmentIds.map(Number)},
+            id: { in: shipmentIds.map(Number) },
           },
           select: {
             id: true,
@@ -111,8 +115,9 @@ class TripController {
         if (driver && driver.phoneNumber) {
           const driverDestination = "91" + driver.phoneNumber;
 
-          const link = GenerateLink.generateTrackLink(trip.id);
-          console.log(link);
+
+
+
 
           await MyOperatorService.sendWhatsAppDriver(
             driverDestination,
@@ -141,7 +146,7 @@ class TripController {
   static getAllTrips = async (req, res) => {
     try {
       const trips = await prisma.trip.findMany({
-        where:{
+        where: {
           tenantId: req.user.id,
         },
         orderBy: {
@@ -347,6 +352,11 @@ class TripController {
         include: {
           driver: true,
           truck: true,
+          shipmentOtps: {
+            select: {
+              link: true,
+            }
+          },
           tripShipments: {
             include: {
               shipment: {

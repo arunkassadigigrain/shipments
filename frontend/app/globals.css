@@ -172,3 +172,15 @@ input[type=number] {
   -moz-appearance: textfield;
   
 }
+
+
+
+.digi {
+  color: #22c55e; /* green */
+  font-weight: 600;
+}
+
+.grain {
+  color: #2563eb; /* blue */
+  font-weight: 600;
+}

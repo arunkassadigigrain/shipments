@@ -1,6 +1,5 @@
 import prisma from "../config/prisma.js";
 
-
 class BusinessController {
 
   static createBusiness = async (req, res) => {

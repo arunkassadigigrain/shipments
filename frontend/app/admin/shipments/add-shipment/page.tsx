@@ -1,11 +1,12 @@
 "use client";
-import { Menu, Truck, Plus, Trash2, AlertCircle, Ship } from "lucide-react";
+import { Menu, Truck, Plus, Trash2, AlertCircle } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import Select from "react-select";
 import { useGetAllItemsQuery } from "@/app/admin/services/itemApi";
 import { useGetAllCustomerQuery } from "@/app/admin/services/customerApi";
 import { useCreateShipmentMutation } from "@/app/admin/services/shipmentApi";
 import Sidebar from "@/app/admin/components/sidebar";
+
 
 export default function AddShipment() {
   const { data: items = [], isLoading: itemsLoading } = useGetAllItemsQuery();
@@ -67,6 +68,47 @@ export default function AddShipment() {
       })),
     [items],
   );
+
+  const clearAll = () => {
+    // Reset shipment items
+    setRows([
+      {
+        itemId: "",
+        quantity: 1,
+        itemRate: "",
+        subtotal: 0,
+      },
+    ]);
+
+    // Reset business / customer info
+    setSelectedBusinessId("");
+    setContactPersonName("");
+    setEmail("");
+    setPhoneNumber("");
+
+    // Reset billing address
+    setBillingAddress({
+      addressLine1: "",
+      addressLine2: "",
+      cityOrDistrict: "",
+      stateOrProvince: "",
+      postalCode: "",
+    });
+
+    // Reset shipping address
+    setShippingAddress({
+      addressLine1: "",
+      addressLine2: "",
+      cityOrDistrict: "",
+      stateOrProvince: "",
+      postalCode: "",
+    });
+
+    // Reset flags / messages
+    setIsShippingSameAsBilling(true);
+    setSuccessMessage(null);
+    setErrorMessage(null);
+  };
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -149,16 +191,7 @@ export default function AddShipment() {
     billingAddress.postalCode,
   ].filter(Boolean);
 
-  let fullBillingAddress = "";
-
-  if (parts.length === 1) {
-    fullBillingAddress = parts[0];
-  } else if (parts.length === 3) {
-    fullBillingAddress = parts.join(" and ");
-  } else if (parts.length > 3) {
-    fullBillingAddress =
-      parts.slice(0, -1).join(", ") + parts[parts.length - 1];
-  }
+  const fullBillingAddress = parts.join(", ");
 
   console.log(fullBillingAddress);
 
@@ -181,14 +214,14 @@ export default function AddShipment() {
       ...(isShippingSameAsBilling
         ? {}
         : {
-            shippingAddress: {
-              addressLine1: shippingAddress.addressLine1.trim(),
-              addressLine2: shippingAddress.addressLine2.trim() || undefined,
-              cityOrDistrict: shippingAddress.cityOrDistrict.trim(),
-              stateOrProvince: shippingAddress.stateOrProvince.trim(),
-              postalCode: Number(shippingAddress.postalCode),
-            },
-          }),
+          shippingAddress: {
+            addressLine1: shippingAddress.addressLine1.trim(),
+            addressLine2: shippingAddress.addressLine2.trim() || undefined,
+            cityOrDistrict: shippingAddress.cityOrDistrict.trim(),
+            stateOrProvince: shippingAddress.stateOrProvince.trim(),
+            postalCode: Number(shippingAddress.postalCode),
+          },
+        }),
       items: rows.map((r) => ({
         itemId: Number(r.itemId),
         quantity: Number(r.quantity),
@@ -204,6 +237,17 @@ export default function AddShipment() {
       );
 
       setSelectedBusinessId("");
+      setContactPersonName("");
+      setEmail("");
+      setPhoneNumber("");
+      setBillingAddress({
+        addressLine1: "",
+        addressLine2: "",
+        cityOrDistrict: "",
+        stateOrProvince: "",
+        postalCode: "",
+      });
+
       setRows([{ itemId: "", quantity: 1, itemRate: "", subtotal: 0 }]);
       setIsShippingSameAsBilling(true);
     } catch (err: any) {
@@ -269,8 +313,8 @@ export default function AddShipment() {
                         <AlertCircle className="w-6 h-6" />
                         <span>
                           {error &&
-                          "data" in error &&
-                          (error.data as any)?.message
+                            "data" in error &&
+                            (error.data as any)?.message
                             ? (error.data as any).message
                             : "Failed to create truck. Please check the details."}
                         </span>
@@ -329,10 +373,9 @@ export default function AddShipment() {
                             onChange={handleBusinessChange}
                             classNames={{
                               control: ({ isFocused }) =>
-                                `input input-bordered w-full outline-none rounded-2xl bg-base-100/50 border-base-300 transition-all duration-300 ${
-                                  isFocused
-                                    ? "border-primary ring-4 ring-primary/20"
-                                    : ""
+                                `input input-bordered w-full outline-none rounded-2xl bg-base-100/50 border-base-300 transition-all duration-300 ${isFocused
+                                  ? "border-primary ring-4 ring-primary/20"
+                                  : ""
                                 }`,
                               valueContainer: () => "px-3",
                               input: () => "text-sm",
@@ -341,8 +384,7 @@ export default function AddShipment() {
                               menu: () =>
                                 "mt-2 rounded-xl border border-base-300 bg-base-100 shadow-lg",
                               option: ({ isFocused, isSelected }) =>
-                                `px-3 py-2 cursor-pointer text-sm ${
-                                  isFocused ? "bg-base-200" : ""
+                                `px-3 py-2 cursor-pointer text-sm ${isFocused ? "bg-base-200" : ""
                                 } ${isSelected ? "bg-primary text-primary-content" : ""}`,
                             }}
                           />
@@ -370,11 +412,10 @@ export default function AddShipment() {
                             onChange={(e) =>
                               setContactPersonName(e.target.value)
                             }
-                            className={`input input-bordered w-full cursor-not-allowed rounded-2xl border-base-300 transition-all duration-300 outline-none ${
-                              isBusinessSelected
+                            className={`input input-bordered w-full cursor-not-allowed rounded-2xl border-base-300 transition-all duration-300 outline-none ${isBusinessSelected
                                 ? "bg-neutral/10 text-base-content/70 cursor-not-allowed"
                                 : "bg-base-100/50 focus:border-primary focus:ring-4 focus:ring-primary/20"
-                            }`}
+                              }`}
                             required
                             disabled={isBusinessSelected || isSubmitting}
                           />
@@ -390,11 +431,10 @@ export default function AddShipment() {
                             value={email}
                             readOnly
                             onChange={(e) => setEmail(e.target.value)}
-                            className={`input input-bordered w-full cursor-not-allowed rounded-2xl border-base-300 transition-all duration-300 outline-none ${
-                              isBusinessSelected
+                            className={`input input-bordered w-full cursor-not-allowed rounded-2xl border-base-300 transition-all duration-300 outline-none ${isBusinessSelected
                                 ? "bg-neutral/10 text-base-content/70 cursor-not-allowed"
                                 : "bg-base-100/50 focus:border-primary focus:ring-4 focus:ring-primary/20"
-                            }`}
+                              }`}
                             required
                             disabled={isBusinessSelected || isSubmitting}
                           />
@@ -411,11 +451,10 @@ export default function AddShipment() {
                             readOnly
                             value={phoneNumber}
                             onChange={(e) => setPhoneNumber(e.target.value)}
-                            className={`input input-bordered w-full cursor-not-allowed rounded-2xl border-base-300 transition-all duration-300 outline-none ${
-                              isBusinessSelected
+                            className={`input input-bordered w-full cursor-not-allowed rounded-2xl border-base-300 transition-all duration-300 outline-none ${isBusinessSelected
                                 ? "bg-neutral/10 text-base-content/70 cursor-not-allowed"
                                 : "bg-base-100/50 focus:border-primary focus:ring-4 focus:ring-primary/20"
-                            }`}
+                              }`}
                             required
                             disabled={isBusinessSelected || isSubmitting}
                           />
@@ -447,11 +486,10 @@ export default function AddShipment() {
                                 addressLine1: e.target.value,
                               }))
                             }
-                            className={`input input-bordered w-full cursor-not-allowed rounded-2xl border-base-300 transition-all duration-300 outline-none ${
-                              isBusinessSelected
+                            className={`input input-bordered w-full cursor-not-allowed rounded-2xl border-base-300 transition-all duration-300 outline-none ${isBusinessSelected
                                 ? "bg-neutral/10 text-base-content/70 cursor-not-allowed"
                                 : "bg-base-100/50 focus:border-primary focus:ring-4 focus:ring-primary/20"
-                            }`}
+                              }`}
                             required
                             disabled={isBusinessSelected || isSubmitting}
                           />
@@ -474,11 +512,10 @@ export default function AddShipment() {
                                 addressLine2: e.target.value,
                               }))
                             }
-                            className={`input input-bordered w-full cursor-not-allowed rounded-2xl border-base-300 transition-all duration-300 outline-none ${
-                              isBusinessSelected
+                            className={`input input-bordered w-full cursor-not-allowed rounded-2xl border-base-300 transition-all duration-300 outline-none ${isBusinessSelected
                                 ? "bg-neutral/10 text-base-content/70 cursor-not-allowed"
                                 : "bg-base-100/50 focus:border-primary focus:ring-4 focus:ring-primary/20"
-                            }`}
+                              }`}
                             disabled={isBusinessSelected || isSubmitting}
                           />
                         </div>
@@ -668,6 +705,7 @@ export default function AddShipment() {
                                   </td>
 
                                   {/* Item Select */}
+                                  {/* Item Select */}
                                   <td>
                                     <Select
                                       unstyled
@@ -675,9 +713,24 @@ export default function AddShipment() {
                                       isClearable
                                       isSearchable
                                       placeholder="- Search item..."
-                                      options={itemOptions}
-                                      value={selectedItemOption}
-                                      // maxMenuHeight={160}
+                                      // ────────────────────────────────────────────────────────────────
+                                      // ← This is the only changed line – add this filter
+                                      options={itemOptions.filter(
+                                        (option) =>
+                                          // Allow this row's currently selected item + exclude items already used in other rows
+                                          option.value === row.itemId ||
+                                          !rows.some(
+                                            (r, rowIndex) =>
+                                              rowIndex !== i &&
+                                              r.itemId === option.value,
+                                          ),
+                                      )}
+                                      // ────────────────────────────────────────────────────────────────
+                                      value={
+                                        itemOptions.find(
+                                          (opt) => opt.value === row.itemId,
+                                        ) || null
+                                      }
                                       onChange={(option) =>
                                         updateRow(
                                           i,
@@ -695,10 +748,9 @@ export default function AddShipment() {
                                       menuPlacement="auto"
                                       classNames={{
                                         control: ({ isFocused }) =>
-                                          `input input-bordered w-full outline-none rounded-2xl bg-base-100/50 border-base-300 transition-all duration-300 ${
-                                            isFocused
-                                              ? "border-primary ring-4 ring-primary/20"
-                                              : ""
+                                          `input input-bordered w-full outline-none rounded-2xl bg-base-100/50 border-base-300 transition-all duration-300 ${isFocused
+                                            ? "border-primary ring-4 ring-primary/20"
+                                            : ""
                                           }`,
                                         valueContainer: () => "px-3",
                                         input: () => "text-sm",
@@ -708,8 +760,7 @@ export default function AddShipment() {
                                         menu: () =>
                                           "mt-2 rounded-xl border border-base-300 bg-base-100 shadow-lg",
                                         option: ({ isFocused, isSelected }) =>
-                                          `px-3 py-2 cursor-pointer text-sm ${
-                                            isFocused ? "bg-base-200" : ""
+                                          `px-3 py-2 cursor-pointer text-sm ${isFocused ? "bg-base-200" : ""
                                           } ${isSelected ? "bg-primary text-primary-content" : ""}`,
                                       }}
                                     />
@@ -808,26 +859,15 @@ export default function AddShipment() {
                         className={`btn btn-primary rounded-2xl px-8 hover:shadow-xl hover:shadow-primary/20 transform hover:-translate-y-0.5 transition-all duration-300 font-medium${isSubmitting ? "loading" : ""}`}
                         disabled={isSubmitting}
                       >
-                        <Ship className="h-6 w-6 text-white-200" />
                         {isSubmitting ? "Submitting..." : "Create Shipment"}
                       </button>
                       <button
                         type="button"
-                        className="btn btn-ghost border-primary/20 rounded-2xl w-44 px-8 hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 font-medium"
+                        className="btn btn-ghost border-primary/20 rounded-2xl px-8 hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 font-medium"
                         disabled={isSubmitting}
-                        onClick={() => {
-                          setSelectedBusinessId("");
-                          setRows([
-                            {
-                              itemId: "",
-                              quantity: 1,
-                              itemRate: "",
-                              subtotal: 0,
-                            },
-                          ]);
-                        }}
+                        onClick={clearAll}
                       >
-                        Reset
+                        Clear
                       </button>
                     </div>
                   </form>

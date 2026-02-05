@@ -10,18 +10,14 @@ type item = {
   itemName: string;
   itemVariety: string;
   packingType: string;
- itemDescription?: string;
+  itemDescription?: string;
 };
 
 export default function ShipmentStatusPage() {
   const [search, setSearch] = useState("");
 
   // 🔹 RTK Query hook
-  const {
-    data: items = [],
-    isLoading,
-    isError,
-  } = useGetAllItemsQuery();
+  const { data: items = [], isLoading, isError } = useGetAllItemsQuery();
 
   // 🔹 Filter items
   const filteredItems = useMemo(() => {
@@ -32,7 +28,7 @@ export default function ShipmentStatusPage() {
         item.itemName.toLowerCase().includes(query) ||
         item.itemVariety.toLowerCase().includes(query) ||
         item.packingType.toLowerCase().includes(query) ||
-        item.itemDescription?.toLowerCase().includes(query)
+        item.itemDescription?.toLowerCase().includes(query),
     );
   }, [items, search]);
 
@@ -41,16 +37,15 @@ export default function ShipmentStatusPage() {
       <Sidebar />
       <div className="drawer-content bg-base-200 p-6">
         {/* Header */}
-       
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-{/* Drawer toggle button (mobile only) */}
-                  <label
-      htmlFor="my-drawer"
-      className="btn btn-square btn-ghost lg:hidden"
-    >
-      <Menu className="h-5 w-5" />
-                  </label>
 
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+          {/* Drawer toggle button (mobile only) */}
+          <label
+            htmlFor="my-drawer"
+            className="btn btn-square btn-ghost lg:hidden"
+          >
+            <Menu className="h-5 w-5" />
+          </label>
 
           <h1 className="text-2xl font-bold">Items</h1>
 
@@ -67,7 +62,7 @@ export default function ShipmentStatusPage() {
         <div className="card bg-base-100 shadow rounded-xl">
           <div className="overflow-x-auto p-4">
             <table className="table table-zebra w-full">
-               <thead className="text-black">
+              <thead className="text-black">
                 <tr>
                   <th>Item Name</th>
                   <th>Item Variety</th>
@@ -101,7 +96,7 @@ export default function ShipmentStatusPage() {
                       <td>{item.itemName}</td>
                       <td>{item.itemVariety}</td>
                       <td>{item.packingType}</td>
-                      <td>{item.itemDescription?? "-"}</td>
+                      <td>{item.itemDescription ?? "-"}</td>
                     </tr>
                   ))
                 )}

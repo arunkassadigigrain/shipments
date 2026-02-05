@@ -323,8 +323,8 @@ const Register = () => {
     <div className="flex h-screen bg-black text-white p-4">
       {/* Left Section */}
       <div className="hidden lg:flex w-2/3 flex-col items-center justify-center p-12 bg-gradient-to-b from-blue-500 to-black rounded-t-3xl">
-        <h2 className="text-3xl font-bold mb-3">DigiGrain 360</h2>
-        <h1 className="text-xl mb-4">Join Us Today</h1>
+        <h2 className="text-4xl font-bold mb-3">DigiPOD</h2>
+        <h1 className="text-xl mb-4">Your Company&apos;s Proof of Delivery System</h1>
         <p className="text-gray-300 mb-8 text-center">
           Create your account to start tracking and growing with us.
         </p>
@@ -352,7 +352,7 @@ const Register = () => {
           <input
             type="text"
             name="name"
-            placeholder="Enter your name"
+            placeholder="Full Name"
             value={values.name}
             onChange={handleChange}
             className="w-full px-5 py-3 bg-black border border-gray-700 rounded-lg"
@@ -365,7 +365,7 @@ const Register = () => {
           <input
             type="email"
             name="email"
-            placeholder="Enter your email"
+            placeholder="Email"
             value={values.email}
             onChange={handleChange}
             className="w-full px-5 py-3 bg-black border border-gray-700 rounded-lg"
@@ -378,7 +378,7 @@ const Register = () => {
           <input
             type="tel"
             name="phoneNumber"
-            placeholder="Enter your phone number"
+            placeholder="Phone number"
             value={values.phoneNumber}
             onChange={handleChange}
             className="w-full px-5 py-3 bg-black border border-gray-700 rounded-lg"
@@ -392,7 +392,7 @@ const Register = () => {
             <input
               type={showPassword ? "text" : "password"}
               name="password"
-              placeholder="Enter your password"
+              placeholder="Password"
               value={values.password}
               onChange={handleChange}
               className="w-full px-5 py-3 bg-black border border-gray-700 rounded-lg pr-10"

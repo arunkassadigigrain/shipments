@@ -62,10 +62,10 @@ return (
         {/* Left Gradient Card */}
 
         <div className="hidden relative lg:flex w-2/3 flex-col items-center justify-center p-12 bg-gradient-to-b from-purple-500 to-black rounded-t-3xl grid-lines  ">
-            <h2 className="text-3xl font-bold mb-3">DigiGrain 360</h2>
-            <h1 className="text-4xl font-extrabold mb-4">Get Started with Us</h1>
+            <h1 className="text-4xl font-bold mb-3">DigiPOD</h1>
+            <h2 className="text-xl mb-4">Your Company&apos;s Proof of Delivery System</h2>
             <p className="text-gray-300 mb-8 text-center">
-                Complete these easy steps to register your account.
+                Track all your deliveries in one place with ease and efficiency.
             </p>
         </div>
 
@@ -73,7 +73,7 @@ return (
         {/* Right Login Form */}
         <div className="flex w-full lg:w-1/3 flex-col justify-center px-8 md:px-20">
             <h2 className="text-3xl font-bold mb-2">Log In</h2>
-            <p className="text-gray-400 mb-6">Enter your details to continue</p>
+            {/* <p className="text-gray-400 mb-6">Enter your details to continue</p> */}
 
             {serverErrorMessage && (
                 <div className="bg-red-100 text-red-700 p-2 rounded mb-4 text-center">
@@ -168,7 +168,7 @@ return (
                         href="./reset-password-link"
                         className="text-blue-400 transition duration-300 ease-in-out"
                     >
-                        Forgot?
+                        Forgot Password?
                     </Link>
                 </p>
 

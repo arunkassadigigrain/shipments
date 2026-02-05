@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Menu  } from "lucide-react";
+import { Menu, Package } from "lucide-react";
 import Sidebar from "@/app/admin/components/sidebar";
 import { useGetAllShipmentsQuery } from "@/app/admin/services/shipmentApi";
 
@@ -14,38 +14,28 @@ const StatusBadge = ({ status }: { status: ShipmentStatus }) => {
     {
       label: string;
       className: string;
-   
     }
   > = {
     CREATED: {
       label: "CREATED",
       className: "badge badge-info gap-2",
-     
     },
     ONTHEWAY: {
       label: "ON THE WAY",
       className: "badge badge-warning gap-2",
-     
     },
     COMPLETED: {
       label: "COMPLETED",
       className: "badge badge-success gap-2",
-   
     },
   };
 
- 
-
-  return (
-    <span className={meta[status].className}>
-     
-      {meta[status].label}
-    </span>
-  );
+  return <span className={meta[status].className}>{meta[status].label}</span>;
 };
 
 export default function ShipmentPage() {
   const [search, setSearch] = useState("");
+  const [selectedShipment, setSelectedShipment] = useState<any>(null);
 
   const {
     data: shipments = [],
@@ -57,13 +47,14 @@ export default function ShipmentPage() {
   const filteredShipments = useMemo(() => {
     const q = search.toLowerCase();
 
-    return shipments.filter((s: any) =>
-      s.id.toString().includes(q) ||
-      s.business.businessName.toLowerCase().includes(q) ||
-      s.business.phoneNumber.includes(q) ||
-      s.shippingAddress.addressLine1.toLowerCase().includes(q) ||
-      s.shippingAddress.cityOrDistrict.toLowerCase().includes(q) ||
-      s.shippingAddress.stateOrProvince.toLowerCase().includes(q)
+    return shipments.filter(
+      (s: any) =>
+        s.id.toString().includes(q) ||
+        s.business.businessName.toLowerCase().includes(q) ||
+        s.business.phoneNumber.includes(q) ||
+        s.shippingAddress.addressLine1.toLowerCase().includes(q) ||
+        s.shippingAddress.cityOrDistrict.toLowerCase().includes(q) ||
+        s.shippingAddress.stateOrProvince.toLowerCase().includes(q),
     );
   }, [shipments, search]);
 
@@ -138,7 +129,12 @@ export default function ShipmentPage() {
                         })}
                       </td>
 
-                      <td>{String(s.id).padStart(4, "0")}</td>
+                      <td
+                        className="text-primary cursor-pointer hover:underline font-medium"
+                        onClick={() => setSelectedShipment(s)}
+                      >
+                        Shipment #{String(s.id).padStart(4, "0")}
+                      </td>
 
                       <td>{s.business.businessName}</td>
 
@@ -164,10 +160,87 @@ export default function ShipmentPage() {
                 )}
               </tbody>
             </table>
+            {selectedShipment && (
+              <dialog className="modal modal-open">
+                {/* Header */}
+
+                <div className="modal-box max-w-2xl bg-base-100 rounded-3xl ">
+                  <h3 className="font-bold text-xl mb-4 flex items-center gap-3 border-b pb-2">
+                    <Package className="w-6 h-6 text-primary" />
+                    Shipment #{String(selectedShipment.id).padStart(4, "0")}
+                    <button
+                      className="btn btn-sm btn-circle btn-ghost ml-auto"
+                      onClick={() => setSelectedShipment(null)}
+                    >
+                      ✕
+                    </button>
+                  </h3>
+
+               
+
+                  {/* Business Info */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                    <div className="p-3 bg-base-200 rounded-lg">
+                      <p className="text-xs text-blue-700">Business Name</p>
+                      <p className="font-medium">
+                        {selectedShipment.business.businessName}
+                      </p>
+                    </div>
+
+                    <div className="p-3 bg-base-200 rounded-lg">
+                      <p className="text-xs text-blue-700">Phone Number</p>
+                      <p className="font-medium">
+                        {selectedShipment.business.phoneNumber}
+                      </p>
+                     
+                    </div>
+
+                    <div className="p-3 bg-base-200 rounded-lg ">
+                      <p className="text-xs text-blue-700">Shipping Address</p>
+                      <p className="font-medium">
+                        {selectedShipment.shippingAddress.addressLine1},{" "}
+                        {selectedShipment.shippingAddress.addressLine2},{" "}
+                        {selectedShipment.shippingAddress.cityOrDistrict},{" "}
+                        {selectedShipment.shippingAddress.stateOrProvince},{""}
+                        {selectedShipment.shippingAddress.postalCode}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Items */}
+                  <div className="mt-4">
+                    <p className="text-sm text-blue-700 text-center md-2">
+                      Shipment Items
+                    </p>
+
+                    {selectedShipment.shipmentItems.map((item: any) => (
+                      <div
+                        key={item.id}
+                        className="flex justify-between p-3 bg-base-200 rounded-lg mb-2 text-sm"
+                      >
+                        {/* ✅ ITEM DESCRIPTION */}
+                        <p className="text-sm text-gray-700">
+                          {item.item?.itemDescription || "-"}
+                        </p>
+
+                        <span>Quantity:{item.quantity}</span>
+                        <span>₹Rate:{item.itemRate}</span>
+                        <span>Subtotal: {item.subtotal}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex justify-end mt-3 p-3 rounded-lg font-semibold text-sm">
+                    <span className="mr-4">Total:</span>
+                    <span className="text-primary">
+                      ₹{Number(selectedShipment.totalAmount)}
+                    </span>
+                  </div>
+                </div>
+              </dialog>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
 }
-

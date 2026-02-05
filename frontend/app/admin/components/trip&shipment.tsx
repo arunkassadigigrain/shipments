@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -104,13 +103,21 @@ export default function TripsAndShipments({
         {/* Small circle + pen icon button */}
         <button
           onClick={handleCreateClick}
-          // title="home"
-          className="btn bg-base-100 text-primary hover:bg-primary/10 rounded-3xl  transition-all"
-          title={`Create new ${activeTab === "trips" ? "Trip" : "Shipment"}`}
+          title={`add ${activeTab === "trips" ? "Trip" : "Shipment"}`}
+          className="
+    btn bg-base-100 text-primary hover:bg-primary/10
+    rounded-3xl transition-all
+    px-4 py-2 sm:px-6
+    flex items-center gap-2
+  "
         >
-          {/* <Pen className="h-4 w-4 text-primary" />  */}
-        <h1> {`Create new ${activeTab === "trips" ? "Trip" : "Shipment"}`} </h1>
-          
+          {/* Mobile text */}
+          <span className="block sm:hidden text-sm font-medium">Add</span>
+
+          {/* Desktop text */}
+          <span className="hidden sm:block font-semibold">
+            {`Add ${activeTab === "trips" ? "Trip" : "Shipment"}`}
+          </span>
         </button>
       </div>
 
@@ -266,7 +273,7 @@ function ShipmentsList({ shipments }: { shipments: any[] }) {
             <ul className="text-sm space-y-1">
               {shipment.shipmentItems?.map((item: any) => (
                 <li key={item.id}>
-                  {item.item?.itemName || "Item"} × {item.quantity} (₹
+                  {item?.item?.itemDescription || "Item"} × {item.quantity} (₹
                   {item.subtotal})
                 </li>
               ))}
