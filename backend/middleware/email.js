@@ -18,6 +18,8 @@ class emailMiddleware {
 
       let grandTotal = 0;
 
+      console.log("i am here in email middleware", shipmentId, email, contactPersonName, items);
+
       const rows = items
         .map((item, index) => {
           const price = Number(item.itemRate) || 0;

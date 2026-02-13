@@ -13,7 +13,7 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors({origin: "http://localhost:3000",
+app.use(cors({origin: true,
   credentials: true}));
 app.use(express.json());
 app.use("/api/items", itemRoutes);
@@ -21,7 +21,7 @@ app.use("/api/business", businessRoutes);
 app.use("/api/drivers", driverRoutes);
 app.use("/api/trucks", truckRoutes);
 app.use("/api/shipments", shipmentRoutes);
-app.use("/api/trips", tripRoutes); // Note: This seems to be a duplicate route, consider changing if needed.
+app.use("/api/trips", tripRoutes); 
 app.use("/api/users", userRoutes);
 
 

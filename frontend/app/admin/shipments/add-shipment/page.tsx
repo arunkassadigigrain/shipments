@@ -7,7 +7,6 @@ import { useGetAllCustomerQuery } from "@/app/admin/services/customerApi";
 import { useCreateShipmentMutation } from "@/app/admin/services/shipmentApi";
 import Sidebar from "@/app/admin/components/sidebar";
 
-
 export default function AddShipment() {
   const { data: items = [], isLoading: itemsLoading } = useGetAllItemsQuery();
   const { data: businesses = [], isLoading: businessesLoading } =
@@ -214,14 +213,14 @@ export default function AddShipment() {
       ...(isShippingSameAsBilling
         ? {}
         : {
-          shippingAddress: {
-            addressLine1: shippingAddress.addressLine1.trim(),
-            addressLine2: shippingAddress.addressLine2.trim() || undefined,
-            cityOrDistrict: shippingAddress.cityOrDistrict.trim(),
-            stateOrProvince: shippingAddress.stateOrProvince.trim(),
-            postalCode: Number(shippingAddress.postalCode),
-          },
-        }),
+            shippingAddress: {
+              addressLine1: shippingAddress.addressLine1.trim(),
+              addressLine2: shippingAddress.addressLine2.trim() || undefined,
+              cityOrDistrict: shippingAddress.cityOrDistrict.trim(),
+              stateOrProvince: shippingAddress.stateOrProvince.trim(),
+              postalCode: Number(shippingAddress.postalCode),
+            },
+          }),
       items: rows.map((r) => ({
         itemId: Number(r.itemId),
         quantity: Number(r.quantity),
@@ -313,8 +312,8 @@ export default function AddShipment() {
                         <AlertCircle className="w-6 h-6" />
                         <span>
                           {error &&
-                            "data" in error &&
-                            (error.data as any)?.message
+                          "data" in error &&
+                          (error.data as any)?.message
                             ? (error.data as any).message
                             : "Failed to create truck. Please check the details."}
                         </span>
@@ -363,29 +362,32 @@ export default function AddShipment() {
                                 (option) => option.value === selectedBusinessId,
                               ) || null
                             }
-                            menuPosition="fixed"
-                            menuPlacement="auto"
-                            menuPortalTarget={
-                              typeof window !== "undefined"
-                                ? document.body
-                                : null
-                            }
+                            components={{
+                              DropdownIndicator: null,
+                              IndicatorSeparator: null,
+                            }}
                             onChange={handleBusinessChange}
                             classNames={{
                               control: ({ isFocused }) =>
-                                `input input-bordered w-full outline-none rounded-2xl bg-base-100/50 border-base-300 transition-all duration-300 ${isFocused
-                                  ? "border-primary ring-4 ring-primary/20"
-                                  : ""
+                                `select select-bordered w-full rounded-2xl bg-base-100/50 border-base-300 transition-all duration-300 ${
+                                  isFocused
+                                    ? "border-primary ring-4 ring-primary/20"
+                                    : ""
                                 }`,
-                              valueContainer: () => "px-3",
+                              valueContainer: () => "px-8",
                               input: () => "text-sm",
                               placeholder: () => "text-sm text-base-content/60",
                               indicatorsContainer: () => "pr-2",
                               menu: () =>
                                 "mt-2 rounded-xl border border-base-300 bg-base-100 shadow-lg",
                               option: ({ isFocused, isSelected }) =>
-                                `px-3 py-2 cursor-pointer text-sm ${isFocused ? "bg-base-200" : ""
-                                } ${isSelected ? "bg-primary text-primary-content" : ""}`,
+                                `px-3 py-2 cursor-pointer text-sm ${
+                                  isFocused ? "bg-base-200" : ""
+                                } ${
+                                  isSelected
+                                    ? "bg-primary text-primary-content"
+                                    : ""
+                                }`,
                             }}
                           />
                         </div>
@@ -412,10 +414,11 @@ export default function AddShipment() {
                             onChange={(e) =>
                               setContactPersonName(e.target.value)
                             }
-                            className={`input input-bordered w-full cursor-not-allowed rounded-2xl border-base-300 transition-all duration-300 outline-none ${isBusinessSelected
+                            className={`input input-bordered w-full cursor-not-allowed rounded-2xl border-base-300 transition-all duration-300 outline-none ${
+                              isBusinessSelected
                                 ? "bg-neutral/10 text-base-content/70 cursor-not-allowed"
                                 : "bg-base-100/50 focus:border-primary focus:ring-4 focus:ring-primary/20"
-                              }`}
+                            }`}
                             required
                             disabled={isBusinessSelected || isSubmitting}
                           />
@@ -431,10 +434,11 @@ export default function AddShipment() {
                             value={email}
                             readOnly
                             onChange={(e) => setEmail(e.target.value)}
-                            className={`input input-bordered w-full cursor-not-allowed rounded-2xl border-base-300 transition-all duration-300 outline-none ${isBusinessSelected
+                            className={`input input-bordered w-full cursor-not-allowed rounded-2xl border-base-300 transition-all duration-300 outline-none ${
+                              isBusinessSelected
                                 ? "bg-neutral/10 text-base-content/70 cursor-not-allowed"
                                 : "bg-base-100/50 focus:border-primary focus:ring-4 focus:ring-primary/20"
-                              }`}
+                            }`}
                             required
                             disabled={isBusinessSelected || isSubmitting}
                           />
@@ -451,10 +455,11 @@ export default function AddShipment() {
                             readOnly
                             value={phoneNumber}
                             onChange={(e) => setPhoneNumber(e.target.value)}
-                            className={`input input-bordered w-full cursor-not-allowed rounded-2xl border-base-300 transition-all duration-300 outline-none ${isBusinessSelected
+                            className={`input input-bordered w-full cursor-not-allowed rounded-2xl border-base-300 transition-all duration-300 outline-none ${
+                              isBusinessSelected
                                 ? "bg-neutral/10 text-base-content/70 cursor-not-allowed"
                                 : "bg-base-100/50 focus:border-primary focus:ring-4 focus:ring-primary/20"
-                              }`}
+                            }`}
                             required
                             disabled={isBusinessSelected || isSubmitting}
                           />
@@ -486,10 +491,11 @@ export default function AddShipment() {
                                 addressLine1: e.target.value,
                               }))
                             }
-                            className={`input input-bordered w-full cursor-not-allowed rounded-2xl border-base-300 transition-all duration-300 outline-none ${isBusinessSelected
+                            className={`input input-bordered w-full cursor-not-allowed rounded-2xl border-base-300 transition-all duration-300 outline-none ${
+                              isBusinessSelected
                                 ? "bg-neutral/10 text-base-content/70 cursor-not-allowed"
                                 : "bg-base-100/50 focus:border-primary focus:ring-4 focus:ring-primary/20"
-                              }`}
+                            }`}
                             required
                             disabled={isBusinessSelected || isSubmitting}
                           />
@@ -512,10 +518,11 @@ export default function AddShipment() {
                                 addressLine2: e.target.value,
                               }))
                             }
-                            className={`input input-bordered w-full cursor-not-allowed rounded-2xl border-base-300 transition-all duration-300 outline-none ${isBusinessSelected
+                            className={`input input-bordered w-full cursor-not-allowed rounded-2xl border-base-300 transition-all duration-300 outline-none ${
+                              isBusinessSelected
                                 ? "bg-neutral/10 text-base-content/70 cursor-not-allowed"
                                 : "bg-base-100/50 focus:border-primary focus:ring-4 focus:ring-primary/20"
-                              }`}
+                            }`}
                             disabled={isBusinessSelected || isSubmitting}
                           />
                         </div>
@@ -725,7 +732,11 @@ export default function AddShipment() {
                                               r.itemId === option.value,
                                           ),
                                       )}
-                                      // ────────────────────────────────────────────────────────────────
+                                      components={{
+                                        DropdownIndicator: null,
+                                        IndicatorSeparator: null,
+                                      }}
+                                      maxMenuHeight={160}
                                       value={
                                         itemOptions.find(
                                           (opt) => opt.value === row.itemId,
@@ -748,9 +759,10 @@ export default function AddShipment() {
                                       menuPlacement="auto"
                                       classNames={{
                                         control: ({ isFocused }) =>
-                                          `input input-bordered w-full outline-none rounded-2xl bg-base-100/50 border-base-300 transition-all duration-300 ${isFocused
-                                            ? "border-primary ring-4 ring-primary/20"
-                                            : ""
+                                          `select select-bordered w-full outline-none rounded-2xl bg-base-100/50 border-base-300 transition-all duration-300 ${
+                                            isFocused
+                                              ? "border-primary ring-4 ring-primary/20"
+                                              : ""
                                           }`,
                                         valueContainer: () => "px-3",
                                         input: () => "text-sm",
@@ -758,9 +770,10 @@ export default function AddShipment() {
                                           "text-sm text-base-content/60",
                                         indicatorsContainer: () => "pr-2",
                                         menu: () =>
-                                          "mt-2 rounded-xl border border-base-300 bg-base-100 shadow-lg",
+                                          "mt-2 rounded-xl border border-base-300 bg-base-100 shadow-lg md-min",
                                         option: ({ isFocused, isSelected }) =>
-                                          `px-3 py-2 cursor-pointer text-sm ${isFocused ? "bg-base-200" : ""
+                                          `px-3 py-2 cursor-pointer text-sm ${
+                                            isFocused ? "bg-base-200" : ""
                                           } ${isSelected ? "bg-primary text-primary-content" : ""}`,
                                       }}
                                     />

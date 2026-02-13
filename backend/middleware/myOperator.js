@@ -46,7 +46,7 @@ class MyOperatorService {
         }
       );
 
-    
+
 
 
       return {
@@ -70,6 +70,44 @@ class MyOperatorService {
     }
   }
 
+
+  static async sendWhatsAppTripCompleted(completeddestination, tripId) {
+    try {
+      if (!completeddestination) {
+        console.error("❌ [MyOperator] Destination number missing");
+        return { success: false };
+      }
+
+      const payload = {
+        apiKey: process.env.MYOPERATOR_API_KEY,
+        campaignName: process.env.MYOPERATOR_CAMPAIGNCOMPLETED,
+        destination: completeddestination,
+        userName: process.env.MYOPERATOR_USERNAME,
+        templateParams: [String(tripId)],
+        source: "node-express-api",
+      };
+
+      const response = await axios.post(
+        process.env.MYOPERATOR_URL,
+        payload,
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      return {
+        success: true,
+        message: "WhatsApp sent trip completed successfully",
+        data: response.data,
+      };
+
+    } catch (error) {
+      console.error("📛 WhatsApp Error:", error.message);
+      return {
+        success: false,
+        error: error.response?.data || error.message,
+      };
+    }
+  }
+
   static async sendWhatsAppDriver(driverDestination, trip, link) {
 
     try {
@@ -80,7 +118,7 @@ class MyOperatorService {
           message: "Destination number is required",
         };
       }
-    
+
       const tripid = String(trip);
       const payload = {
         apiKey: process.env.MYOPERATOR_API_KEY,

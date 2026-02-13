@@ -119,11 +119,11 @@ class TripController {
 
 
 
-          await MyOperatorService.sendWhatsAppDriver(
-            driverDestination,
-            trip.id,
-            link
-          );
+          // await MyOperatorService.sendWhatsAppDriver(
+          //   driverDestination,
+          //   trip.id,
+          //   link
+          // );
 
           console.log(`✅ Driver WhatsApp sent → driverId=${driverId}`);
         }
@@ -264,6 +264,31 @@ class TripController {
             Status: "COMPLETED",
           },
         });
+      }
+
+      if (pendingOtps === 0) {
+        const trip = await prisma.trip.findUnique({
+          where: { id: Number(tripId) },
+          include: {
+            tripShipments: {
+              include: {
+                shipment: {
+                  include: {
+                    business: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+
+
+        const completeddestination = "91" + trip.tripShipments[0].shipment.business.phoneNumber;
+
+        await MyOperatorService.sendWhatsAppTripCompleted(
+          completeddestination,
+          tripId
+        );
       }
 
       return res.status(200).json({

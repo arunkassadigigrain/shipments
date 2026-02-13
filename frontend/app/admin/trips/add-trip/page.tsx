@@ -1,6 +1,14 @@
 "use client";
 
-import { Menu, Truck, Plus, Trash2, Package, AlertCircle, MapPinCheckInside } from "lucide-react";
+import {
+  Menu,
+  Truck,
+  Plus,
+  Trash2,
+  Package,
+  AlertCircle,
+  MapPinCheckInside,
+} from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import { toast } from "react-toastify";
 import Select from "react-select";
@@ -250,6 +258,7 @@ export default function AddTrip() {
                         <Select
                           unstyled
                           isSearchable
+                          isClearable
                           placeholder="- Search truck..."
                           options={truckOptions}
                           value={
@@ -266,6 +275,10 @@ export default function AddTrip() {
                           }
                           menuPosition="fixed"
                           menuPlacement="auto"
+                          components={{
+                            DropdownIndicator: null,
+                            IndicatorSeparator: null,
+                          }}
                           classNames={{
                             control: ({ isFocused }) =>
                               `select select-bordered w-full rounded-2xl bg-base-100/50 border-base-300 transition-all duration-300 ${
@@ -301,6 +314,7 @@ export default function AddTrip() {
                         <Select
                           unstyled
                           isSearchable
+                          isClearable
                           required
                           placeholder="- Search driver..."
                           options={driverOptions}
@@ -318,6 +332,10 @@ export default function AddTrip() {
                           }
                           menuPosition="fixed"
                           menuPlacement="auto"
+                          components={{
+                            DropdownIndicator: null,
+                            IndicatorSeparator: null,
+                          }}
                           classNames={{
                             control: ({ isFocused }) =>
                               `select select-bordered w-full rounded-2xl bg-base-100/50 border-base-300 transition-all duration-300 ${
@@ -432,7 +450,7 @@ export default function AddTrip() {
                                   menuPlacement="auto"
                                   classNames={{
                                     control: ({ isFocused }) =>
-                                      `select select-bordered w-full rounded-2xl bg-base-100/50 border-base-300 transition-all duration-300 ${
+                                      `input input-bordered w-full outline-none rounded-2xl bg-base-100/50 border-base-300 transition-all duration-300 ${
                                         isFocused
                                           ? "border-primary ring-4 ring-primary/20"
                                           : ""
@@ -447,11 +465,7 @@ export default function AddTrip() {
                                     option: ({ isFocused, isSelected }) =>
                                       `px-3 py-2 cursor-pointer text-sm ${
                                         isFocused ? "bg-base-200" : ""
-                                      } ${
-                                        isSelected
-                                          ? "bg-primary text-primary-content"
-                                          : ""
-                                      }`,
+                                      } ${isSelected ? "bg-primary text-primary-content" : ""}`,
                                   }}
                                 />
                               </td>
@@ -518,7 +532,7 @@ export default function AddTrip() {
                       }`}
                       disabled={isSubmitting}
                     >
-                      <MapPinCheckInside  className="h-5 w-5" />
+                      <MapPinCheckInside className="h-5 w-5" />
                       {isSubmitting ? "Creating..." : "Create Trip"}
                     </button>
 
